@@ -3,10 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2D Net Builder & 3D Folder</title> <link rel="stylesheet" href="styles.css">
+    <title>2D Net Builder & 3D Folder</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <h1>2D Net Builder & 3D Folder</h1> <div class="container">
+    <h1>2D Net Builder & 3D Folder</h1>
+    <div class="container">
         <div id="palette">
              <h2>Palette</h2>
              <div id="palette-controls">
@@ -19,7 +21,6 @@
                  <button id="backTo2DButton" style="display: none;">Back to 2D Editor</button>
             </div>
              <div id="palette-buttons"></div>
-             <div id="color-selectors"></div>
              <div id="instructions">
                  <p>Click palette -> canvas to place.</p>
                  <p>Click & Drag shape to move.</p>
@@ -27,14 +28,21 @@
                  <p>Hold SPACEBAR & Drag to Pan view.</p>
                  <p>Edges glow magenta when near snap.</p>
                  <p>(Del/Bksp to delete selected)</p>
-                 <p>Click 'Fold Net in 3D' to view.</p>
+                 <p>Right-click polygon to change color.</p> <p>Click 'Fold Net in 3D' to view.</p>
              </div>
         </div>
         <div class="view-area">
             <canvas id="netCanvas"></canvas>
+
+            <div id="colorContextMenu" class="context-menu">
+                <div class="menu-header">Change Color</div>
+                <ul id="colorMenuList">
+                    </ul>
+            </div>
             <div id="threeContainer" style="display: none;">
                  <canvas id="threeCanvas"></canvas>
-                 <div id="foldingControls"> <div id="foldingInfo">Loaded Net</div>
+                 <div id="foldingControls">
+                     <div id="foldingInfo">Loaded Net</div>
                      <div>
                          <button id="foldButton3D">Fold</button>
                          <button id="pauseButton3D">Pause</button>

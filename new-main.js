@@ -16,42 +16,59 @@ const POLYGON_TYPES = {
     8: "Octagon",
     10: "Decagon", // Removed 9 for consistency
 };
+
+// --- UPDATED DEFAULT_COLORS ---
+// Using standard HTML color names where available
 const DEFAULT_COLORS = {
-    3: "#FFADAD",
-    4: "#FFD6A5",
-    5: "#FDFFB6",
-    6: "#CAFFBF",
-    8: "#A0C4FF",
-    10: "#BDB2FF",
+    3: "yellow",   // Triangle
+    4: "red",      // Square
+    5: "blue",     // Pentagon
+    6: "green",    // Hexagon
+    8: "pink",     // Octagon
+    10: "orange",  // Decagon
 };
+
+// Constant for the Palette Choice option value
+const PALETTE_CHOICE_VALUE = "__palette_choice__";
+
+
 function calculateRadiusForSideLength(sides, sideLength) {
     if (sides < 3) return 0;
     return sideLength / (2 * Math.sin(Math.PI / sides));
 }
 
 // App 2 Folding Data Tables
+// COLOR_NAME_TO_HEX is already defined and useful for the 3D viewer, keep it.
 const COLOR_NAME_TO_HEX = {
-    // Kept for parseColor robustness, though App 1 uses hex
+    // Kept for parseColor robustness, supports common names and adds default colors
     red: 0xff0000,
     yellow: 0xffff00,
-    green: 0x00ff00,
+    green: 0x0fe645, // Bright green
     blue: 0x0000ff,
     cyan: 0x00ffff,
     magenta: 0xff00ff,
     pink: 0xffc0cb,
     purple: 0x800080,
     teal: 0x008080,
-    orange: 0xffa500,
+    orange: 0xffa500, // Standard orange
     lime: 0x00ff00,
     indigo: 0x4b0082,
     violet: 0xee82ee,
     gold: 0xffd700,
     silver: 0xc0c0c0,
     gray: 0x808080,
-    grey: 0x808080,
+    grey: 0x808080, // Corrected grey hex
     white: 0xffffff,
     black: 0x000000,
+    // Add hex for original defaults just in case
+    "#FFADAD": 0xffadad,
+    "#FFD6A5": 0xffd6a5,
+    "#FDFFB6": 0xfdffb6,
+    "#CAFFBF": 0xcaffbf,
+    "#A0C4FF": 0xa0c4ff,
+    "#BDB2FF": 0xbdb2ff,
 };
+
 
 // *** UPDATED Polyhedron data table - Formatted ***
 const POLYHEDRON_DATA = {
@@ -235,8 +252,8 @@ const POLYHEDRON_DATA = {
             10: 12,
 	},
 	foldAngles: {
-            "4-6":  Math.acos((Math.sqrt(3) + Math.sqrt(15)) / 6), 
-            "6-4":  Math.acos((Math.sqrt(3) + Math.sqrt(15)) / 6), 
+            "4-6":  Math.acos((Math.sqrt(3) + Math.sqrt(15)) / 6),
+            "6-4":  Math.acos((Math.sqrt(3) + Math.sqrt(15)) / 6),
             "4-10": Math.acos(Math.sqrt((5 + Math.sqrt(5)) / 10)),
             "10-4": Math.acos(Math.sqrt((5 + Math.sqrt(5)) / 10)),
             "10-6": Math.acos(Math.sqrt((5 + (2 * Math.sqrt(5))) / 15)),
@@ -287,27 +304,24 @@ for (const key in POLYHEDRON_DATA) {
 }
 
 // --- DOM Elements ---
-export const canvas = document.getElementById("netCanvas");
-export const ctx = canvas ? canvas.getContext("2d") : null;
-export const paletteDiv = document.getElementById("palette");
-export const paletteControlsDiv = document.getElementById("palette-controls");
-export const paletteButtonsDiv = document.getElementById("palette-buttons");
-export const colorSelectorsDiv = document.getElementById("color-selectors");
-export const saveButton = document.getElementById("saveButton"); // Saves App 1 format
-export const loadFileInput = document.getElementById("loadFileInput"); // Loads App 1 format
-export const clearButton = document.getElementById("clearButton");
-export const exportTopologicalButton = document.getElementById(
-    "exportTopologicalButton",
-); // Exports App 2 format
-export const switchTo3DButton = document.getElementById("switchTo3DButton"); // Switches to folding view
-export const backTo2DButton = document.getElementById("backTo2DButton");
-export const threeContainer = document.getElementById("threeContainer"); // Container for folding view
+let canvas, ctx, paletteDiv, paletteControlsDiv, paletteButtonsDiv;
+let saveButton, loadFileInput, clearButton, exportTopologicalButton;
+let switchTo3DButton, backTo2DButton, threeContainer;
+
+
+
+// --- DOM Elements for Color Context Menu ---
+// Declare variables here, but initialize them in the initialize function
+let colorContextMenu = null;
+let colorMenuList = null;
+
+let pureColor = 0;
 
 // --- App 1 State ---
 let editorState = {
     netPolygons: [],
     nextPolygonId: 0,
-    selectedPolygonId: null,
+    selectedPolygonId: null, // Keep selectedPolygonId for rotation/deletion
     draggedPolygon: null,
     dragOffsetX: 0,
     dragOffsetY: 0,
@@ -320,7 +334,10 @@ let editorState = {
     isActivelyPanning: false,
     panStartX: 0,
     panStartY: 0,
-    polygonColors: { ...DEFAULT_COLORS },
+
+    // --- State for Color Context Menu ---
+    colorMenuPolygonId: null, // ID of the polygon that was right-clicked
+    customColorsHistory: [], // Array to store custom colors chosen via the palette picker
 };
 
 // --- App 2 (Folding Viewer) State (Encapsulated) ---
@@ -364,6 +381,7 @@ export function updateState(newState) {
     editorState = { ...editorState, ...newState };
 }
 
+
 // --- App 1 State Accessor/Helper Functions ---
 export function getPolygonById(id) {
     return editorState.netPolygons.find((p) => p.id === id);
@@ -399,16 +417,10 @@ export function deselectAllPolygons() {
             selectionChanged = true;
             // Faster to just update property if we allow mutation
             p.isSelected = false;
-            // If immutable:
-            // const newP = Object.assign(Object.create(Object.getPrototypeOf(p)), p);
-            // newP.isSelected = false;
-            // return newP;
         }
         return p;
     });
     if (selectionChanged) {
-        // If immutable: updateState({ netPolygons: updatedPolygons, selectedPolygonId: null });
-        // If mutable:
         updateState({ selectedPolygonId: null });
     }
     return selectionChanged;
@@ -428,7 +440,8 @@ export class Polygon {
         sides,
         centerPosition,
         rotationAngle = 0,
-        color = editorState.polygonColors[sides] || DEFAULT_COLORS[sides],
+        // Get default color directly from the global constant
+        color = DEFAULT_COLORS[sides],
         connections = {},
     ) {
         this.id = id;
@@ -437,6 +450,7 @@ export class Polygon {
         this.rotationAngle = normalizeAngle(rotationAngle);
         this.radius = calculateRadiusForSideLength(sides, TARGET_SIDE_LENGTH);
         this.sideLength = TARGET_SIDE_LENGTH;
+        // The color can be a string (name or hex)
         this.color = color;
         this.connections =
             typeof connections === "object" && connections !== null
@@ -554,6 +568,7 @@ export class Polygon {
     updateRotation(newAngle) {
         this.rotationAngle = normalizeAngle(newAngle);
     }
+    // Method to update the color of a specific polygon instance
     updateColor(newColor) {
         this.color = newColor;
     }
@@ -583,9 +598,10 @@ export class Polygon {
         const absVertices = this.getAbsoluteVertices();
         if (absVertices.length === 0) return;
         console.log(
-            `[DEBUG PolyDraw] Drawing Polygon ID <span class="math-inline">\{this\.id\}\. Center\: \(</span>{this.centerPosition.x.toFixed(1)}, ${this.centerPosition.y.toFixed(1)}), Color: ${this.color}, Selected: ${this.isSelected}`,
+            `[DEBUG PolyDraw] Drawing Polygon ID ${this.id}. Center: (${this.centerPosition.x.toFixed(1)}, ${this.centerPosition.y.toFixed(1)}), Color: ${this.color}, Selected: ${this.isSelected}`,
         );
         ctx.save();
+        // Canvas fillStyle supports color names and hex strings directly
         ctx.fillStyle = this.color;
         ctx.strokeStyle = this.isSelected ? "#0000FF" : "#333333";
         ctx.lineWidth = this.isSelected ? 3 : 1;
@@ -626,6 +642,7 @@ export class Polygon {
             sides: this.sides,
             centerPosition: { ...this.centerPosition },
             rotationAngle: this.rotationAngle,
+            // Save the color value (which could be a name or hex)
             color: this.color,
             connections: { ...this.connections },
         };
@@ -637,6 +654,7 @@ export class Polygon {
             data.sides,
             data.centerPosition,
             data.rotationAngle,
+            // Load the color directly from data (name or hex)
             data.color,
             data.connections || {},
         );
@@ -647,6 +665,7 @@ export class Polygon {
 // end of polygon.js section
 /////////////////////////
 
+
 /////////////////////////
 // start of drawing.js section
 /////////////////////////
@@ -656,7 +675,7 @@ export function clearCanvas() {
 export function drawNet() {
     if (!ctx || !canvas) return;
     console.log(
-        `[DEBUG DrawNet] Drawing <span class="math-inline">\{editorState\.netPolygons\.length\} polygons\. Offset\: \(</span>{editorState.viewOffsetX.toFixed(0)}, ${editorState.viewOffsetY.toFixed(0)})`,
+        `[DEBUG DrawNet] Drawing ${editorState.netPolygons.length} polygons. Offset: (${editorState.viewOffsetX.toFixed(0)}, ${editorState.viewOffsetY.toFixed(0)})`,
     );
     clearCanvas();
     // Draw non-selected polygons first
@@ -721,6 +740,7 @@ export function drawNet() {
 // end of drawing.js section
 /////////////////////////
 
+
 /////////////////////////
 // start of palette.js section
 /////////////////////////
@@ -750,56 +770,11 @@ function handlePaletteClick(event) {
         `[DEBUG PaletteClick] Set currentPaletteSelection to: ${sides}`,
     );
     deselectAllPolygons();
-    // drawNet(); // No need to redraw yet
+    // Hide context menu if open
+    hideColorContextMenu();
 }
 
-export function createColorPickers() {
-    if (!colorSelectorsDiv) return;
-    colorSelectorsDiv.innerHTML = "";
-    const colorFragment = document.createDocumentFragment();
-    const heading = document.createElement("h3");
-    heading.textContent = "Colors:";
-    colorFragment.appendChild(heading);
 
-    // Corrected Destructuring: [sides, name]
-    Object.entries(POLYGON_TYPES).forEach(([sides, name]) => {
-        const sideNum = parseInt(sides, 10); // Now 'sides' correctly holds "3", "4", etc.
-        // Check if sideNum is a valid key before proceeding
-        if (isNaN(sideNum) || !editorState.polygonColors[sideNum]) {
-            console.warn(
-                `Skipping color picker for invalid side number: ${sides}`,
-            );
-            return; // Use return instead of continue in forEach callback
-        }
-        const colorDiv = document.createElement("div");
-        const label = document.createElement("label");
-        label.textContent = `${name}:`; // Now 'name' correctly holds "Triangle", etc.
-        label.htmlFor = `color-${sideNum}`;
-        const picker = document.createElement("input");
-        picker.type = "color";
-        picker.id = `color-${sideNum}`;
-        picker.value = editorState.polygonColors[sideNum]; // Use correct sideNum key
-        picker.dataset.sides = sideNum;
-        picker.addEventListener("input", handleColorChange);
-        picker.addEventListener("change", handleColorChange);
-        colorDiv.appendChild(label);
-        colorDiv.appendChild(picker);
-        colorFragment.appendChild(colorDiv);
-    });
-    colorSelectorsDiv.appendChild(colorFragment);
-    console.log("Color pickers created.");
-}
-function handleColorChange(event) {
-    const newColor = event.target.value;
-    const sideKey = parseInt(event.target.dataset.sides, 10);
-    updateState({
-        polygonColors: { ...editorState.polygonColors, [sideKey]: newColor },
-    });
-    editorState.netPolygons.forEach((p) => {
-        if (p.sides === sideKey) p.color = newColor;
-    }); // Mutate directly
-    drawNet();
-}
 export function placeNewPolygon(mousePos) {
     // mousePos is world coordinates
     console.log(
@@ -807,12 +782,13 @@ export function placeNewPolygon(mousePos) {
     );
     if (editorState.currentPaletteSelection !== null) {
         const sides = editorState.currentPaletteSelection;
+        // Polygon constructor now defaults to the color from DEFAULT_COLORS
         const newPolygon = new Polygon(
             editorState.nextPolygonId,
             sides,
             { x: mousePos.x, y: mousePos.y },
             0,
-            editorState.polygonColors[sides],
+            // No need to pass color here, constructor uses DEFAULT_COLORS
         );
         console.log(`Placed ${POLYGON_TYPES[sides]} ID ${newPolygon.id}`);
         const currentLength = editorState.netPolygons.length; // Declare currentLength BEFORE using it
@@ -835,6 +811,7 @@ export function placeNewPolygon(mousePos) {
 // end of palette.js section
 /////////////////////////
 
+
 /////////////////////////
 // start of interaction.js section
 /////////////////////////
@@ -851,30 +828,24 @@ function getRawMousePos(canvasElement, event) {
     const rect = canvasElement.getBoundingClientRect();
     return { x: event.clientX - rect.left, y: event.clientY - rect.top };
 }
-export function handleMouseDown(event) {
+
+// --- Handle Right-Click for Color Context Menu ---
+function handleContextMenu(event) {
+    // Only show context menu in 2D view
+    if (threeContainer && threeContainer.style.display !== 'none') {
+         return;
+    }
+
+    event.preventDefault(); // Prevent the default browser context menu
+
     if (!canvas) return;
+
     const rawMousePos = getRawMousePos(canvas, event);
     const worldMousePos = getMousePos(canvas, event);
-    if (editorState.isPanning) {
-        updateState({
-            isActivelyPanning: true,
-            panStartX: rawMousePos.x,
-            panStartY: rawMousePos.y,
-        });
-        canvas.classList.remove("pan-grab");
-        canvas.classList.add("pan-grabbing");
-        return;
-    }
-    if (editorState.currentPaletteSelection !== null) {
-        console.log(
-            `[DEBUG MouseDown] Palette selection detected. Calling placeNewPolygon at:`,
-            worldMousePos,
-        );
-        placeNewPolygon(worldMousePos);
-        canvas.style.cursor = editorState.isPanning ? "grab" : "default";
-        return;
-    }
+
+    // Find if a polygon was clicked at this position
     let clickedPolygon = null;
+    // Iterate from the end to check the topmost drawn polygon first
     for (let i = editorState.netPolygons.length - 1; i >= 0; i--) {
         const poly = editorState.netPolygons[i];
         if (poly.isPointInside(worldMousePos)) {
@@ -882,38 +853,359 @@ export function handleMouseDown(event) {
             break;
         }
     }
+
     if (clickedPolygon) {
-        bringToFront(clickedPolygon);
-        if (editorState.selectedPolygonId !== clickedPolygon.id) {
-            deselectAllPolygons();
-            clickedPolygon.isSelected = true;
-        }
-        const dragOffsetX = worldMousePos.x - clickedPolygon.centerPosition.x;
-        const dragOffsetY = worldMousePos.y - clickedPolygon.centerPosition.y;
-        updateState({
-            selectedPolygonId: clickedPolygon.id,
-            draggedPolygon: clickedPolygon,
-            dragOffsetX: dragOffsetX,
-            dragOffsetY: dragOffsetY,
-            isDragging: true,
-        });
-        canvas.style.cursor = "grabbing";
-        console.log(
-            `Selected/Dragging polygon ID: ${editorState.selectedPolygonId}`,
-        );
+        // Store the ID of the polygon being colored
+        updateState({ colorMenuPolygonId: clickedPolygon.id });
+        // Populate and show the custom menu
+        populateColorContextMenu(clickedPolygon);
+        showColorContextMenu(rawMousePos.x, rawMousePos.y);
+         console.log(`Right-clicked polygon ID: ${clickedPolygon.id}`);
     } else {
-        if (deselectAllPolygons()) {
-            drawNet();
-        }
-        updateState({ draggedPolygon: null, isDragging: false });
+        // Hide the custom menu if no polygon was clicked
+        hideColorContextMenu();
+         console.log("Right-clicked canvas, no polygon found.");
     }
-    updateState({ currentSnapTarget: null });
-    drawNet();
 }
+
+// --- Show/Hide Color Context Menu ---
+function showColorContextMenu(x, y) {
+    if (!colorContextMenu) {
+        console.error("Cannot show color context menu: Element not found.");
+        return;
+    }
+
+    // Set display to block first so offsetWidth/Height are accurate
+    colorContextMenu.style.display = 'block';
+
+    // Now measure
+    const menuWidth = colorContextMenu.offsetWidth;
+    const menuHeight = colorContextMenu.offsetHeight;
+    const canvasRect = canvas.getBoundingClientRect();
+
+    let finalX = x;
+    let finalY = y;
+
+    colorContextMenu.style.left = x + 'px';
+    colorContextMenu.style.top = y + 'px';
+
+}
+
+function hideColorContextMenu() {
+    // Check if the color context menu element was found during initialization
+    console.trace('hideColorContextMenu called');
+    if (!colorContextMenu) return;
+    colorContextMenu.style.display = 'none';
+    updateState({ colorMenuPolygonId: null }); // Clear the stored polygon ID
+}
+
+// --- Populate Color Context Menu ---
+function populateColorContextMenu(polygon) {
+    // Check if the color menu list element was found during initialization
+    if (!colorMenuList || !polygon) {
+        console.error("Cannot populate color context menu: List element or polygon not found.");
+        return;
+    }
+
+    console.log("Populating menu, colorMenuList:", colorMenuList);
+    colorMenuList.innerHTML = ''; // Clear existing menu items
+
+    // Get polygon's current color for display in menu
+    const currentPolyColor = polygon.color;
+
+    // Add Default Colors
+    const defaultColorNames = Object.values(DEFAULT_COLORS); // Get array of color names
+    const defaultColorKeys = Object.keys(DEFAULT_COLORS); // Get array of side numbers (keys)
+
+    defaultColorNames.forEach((colorName, index) => {
+        const sides = defaultColorKeys[index];
+        const readableName = POLYGON_TYPES[sides] + " Default"; // e.g., "Triangle Default"
+        addColorMenuItem(colorName, readableName, colorName === currentPolyColor);
+    });
+
+    // Add Separator
+    addMenuSeparator();
+
+    // Add Palette Choice option
+    // Check if the color menu list element was found before adding items
+    if (colorMenuList) {
+        const paletteChoiceItem = addColorMenuItem(PALETTE_CHOICE_VALUE, "Palette Choice...");
+        if (paletteChoiceItem) {
+            paletteChoiceItem.classList.add('palette-choice-option'); // Add class for styling/identification
+        }
+    } else {
+         console.error("Cannot add palette choice item: colorMenuList element not found.");
+    }
+
+
+    // Add history of Custom Colors
+    if (editorState.customColorsHistory.length > 0) {
+         addMenuSeparator();
+         // Check if the color menu list element was found before adding header
+         if (colorMenuList) {
+             const historyHeader = document.createElement('li');
+             historyHeader.textContent = "Recent Custom:";
+             historyHeader.style.fontWeight = 'bold';
+             historyHeader.style.cursor = 'default'; // Not clickable
+             historyHeader.style.backgroundColor = 'transparent'; // No hover effect
+             colorMenuList.appendChild(historyHeader);
+         } else {
+              console.error("Cannot add history header: colorMenuList element not found.");
+         }
+
+
+         editorState.customColorsHistory.forEach(colorValue => {
+             addColorMenuItem(colorValue, colorValue, colorValue === currentPolyColor);
+         });
+    }
+    console.log("Menu items:", colorMenuList.children.length);
+}
+
+// Helper function to add a menu item
+function addColorMenuItem(value, text, isCurrent = false) {
+    // Check if the color menu list element was found before creating items
+    if (!colorMenuList) {
+        console.error("Cannot add color menu item: colorMenuList element not found.");
+        return null;
+    }
+
+    const li = document.createElement('li');
+    li.dataset.colorValue = value;
+    li.textContent = text; // Display text
+
+    // Add color swatch
+    const colorBox = document.createElement('span');
+    colorBox.classList.add('color-box');
+    // Use the value itself as the background color (works for names and hex)
+    colorBox.style.backgroundColor = value;
+    li.insertBefore(colorBox, li.firstChild); // Add box before text
+
+    if (isCurrent) {
+        li.style.fontWeight = 'bold'; // Highlight the current color
+        // Optionally add a checkmark or other indicator
+    }
+
+    // Add event listener to the list item
+    li.addEventListener('click', handleColorMenuItemClick);
+
+    // Append the created list item to the menu list
+    colorMenuList.appendChild(li);
+
+    return li; // Return the created list item
+}
+
+// Helper function to add a separator line
+function addMenuSeparator() {
+     // Check if the color menu list element was found before adding separator
+     if (!colorMenuList) {
+         console.error("Cannot add menu separator: colorMenuList element not found.");
+         return;
+     }
+     const li = document.createElement('li');
+     li.classList.add('separator');
+     colorMenuList.appendChild(li);
+}
+
+
+// --- Handle Color Menu Item Click ---
+function handleColorMenuItemClick(event) {
+    const clickedItem = event.target.closest('li'); // Get the list item clicked
+    if (!clickedItem) return; // Ignore clicks not on list items
+
+    const colorValue = clickedItem.dataset.colorValue;
+    const polygonId = editorState.colorMenuPolygonId;
+    const polygon = getPolygonById(polygonId);
+
+    hideColorContextMenu(); // Hide the menu immediately
+
+    if (!polygon) {
+        console.error("Color menu clicked, but no polygon ID was stored or found.");
+        return;
+    }
+
+    if (colorValue === PALETTE_CHOICE_VALUE) {
+        // Handle "Palette Choice..."
+        triggerPaletteColorPicker(polygon);
+    } else {
+        // Handle selection of a default or history color
+        console.log(`Changing color of polygon ${polygonId} to: ${colorValue}`);
+        polygon.updateColor(colorValue);
+        drawNet(); // Redraw the canvas with the new color
+    }
+}
+
+// --- Trigger Standard Palette Color Picker ---
+function triggerPaletteColorPicker(polygon) {
+    if (!polygon) {
+        console.error("Cannot trigger palette color picker: Polygon not found.");
+        return;
+    }
+
+    // Create a temporary hidden color input element
+    const colorInput = document.createElement('input');
+    colorInput.type = 'color';
+    // Position it off-screen
+    colorInput.style.position = 'fixed';
+    colorInput.style.top = '-100px';
+    colorInput.style.left = '-100px';
+    // Set initial value: use current color if it's a hex, otherwise default to black
+    colorInput.value = polygon.color.startsWith('#') ? polygon.color : "#000000";
+
+    document.body.appendChild(colorInput); // Add it to the DOM temporarily
+
+    // Listen for the change event when the user selects a color and closes the picker
+    colorInput.addEventListener('change', (event) => {
+        const newColor = event.target.value; // Get the chosen hex color (e.g., "#RRGGBB")
+
+        console.log(`Palette color chosen for polygon ${polygon.id}: ${newColor}`);
+        polygon.updateColor(newColor); // Update the polygon's color
+
+        // Add the new custom color (hex value) to history if it's not already there
+        // Ensure we add the hex value, even if the user picked a named color initially
+        if (!editorState.customColorsHistory.includes(newColor)) {
+             // Limit history size (e.g., keep the last 10 custom colors)
+             const updatedHistory = [newColor, ...editorState.customColorsHistory.slice(0, 9)];
+             updateState({ customColorsHistory: updatedHistory });
+             console.log("Custom color added to history:", newColor);
+        }
+
+        drawNet(); // Redraw with the new color
+
+        // Clean up the temporary input element
+        document.body.removeChild(colorInput);
+    });
+
+    // Listen for the user canceling the picker (e.g., pressing Escape)
+    colorInput.addEventListener('cancel', () => {
+         console.log("Color picker cancelled.");
+         // Clean up the temporary input element
+         document.body.removeChild(colorInput);
+    });
+
+
+    // Programmatically trigger the native color picker dialog
+    colorInput.click();
+}
+
+// --- Handle Mouse Down (Modified to Hide Menu and filter right-click) ---
+// This function handles left clicks for panning, placing, and dragging.
+// It also hides the color context menu if a click occurs outside it.
+export function handleMouseDown(event) {
+    // Hide the color context menu if it's visible and the click is outside it.
+    // This needs to happen for *any* mouse button click outside the menu.
+    if (colorContextMenu && colorContextMenu.style.display !== 'none') {
+        const rect = colorContextMenu.getBoundingClientRect();
+        const clickedOutsideMenu = event.clientX < rect.left || event.clientX > rect.right ||
+                                   event.clientY < rect.top || event.clientY > rect.bottom;
+
+        if (clickedOutsideMenu) {
+            hideColorContextMenu();
+            // If a click outside hides the menu, we should stop here
+            // to prevent this click from also triggering a drag/place action.
+             // However, if it was a right-click outside, handleContextMenu already prevented default.
+             // If it was a left-click outside, we just hide the menu.
+             // Let's let the click continue ONLY IF it's a left click and it was NOT handled by the menu itself.
+             // The logic below already filters for event.button === 0, so we just need to return if clicked inside.
+        } else {
+             // Click was inside the menu. handleColorMenuItemClick will handle the action.
+             // Stop propagation here to prevent the canvas's mousedown from firing.
+             // Note: This assumes handleColorMenuItemClick is attached correctly and fires first.
+             // event.stopPropagation(); // Might be needed depending on exact event flow
+             return; // Stop here if clicked inside the menu
+         }
+    }
+
+
+    // --- Only proceed with the rest of the handleMouseDown logic for LEFT clicks (event.button === 0) ---
+    if (event.button === 0) {
+
+        if (!canvas) return;
+        const rawMousePos = getRawMousePos(canvas, event);
+        const worldMousePos = getMousePos(canvas, event);
+
+        // Check for panning mode
+        if (editorState.isPanning) {
+            updateState({
+                isActivelyPanning: true,
+                panStartX: rawMousePos.x,
+                panStartY: rawMousePos.y,
+            });
+            // Update cursor class for visual feedback
+            canvas.classList.remove("pan-grab");
+            canvas.classList.add("pan-grabbing");
+            return; // Stop here if panning
+        }
+
+        // Check for palette placement mode
+        if (editorState.currentPaletteSelection !== null) {
+            console.log(
+                `[DEBUG MouseDown] Palette selection detected. Calling placeNewPolygon at:`,
+                worldMousePos,
+            );
+            placeNewPolygon(worldMousePos); // Place the new polygon
+            // Reset cursor after placement
+            canvas.style.cursor = editorState.isPanning ? "grab" : "default";
+            return; // Stop here if placing a polygon
+        }
+
+        // If not panning or placing, check for clicking on an existing polygon to select/drag
+        let clickedPolygon = null;
+        // Iterate through polygons from the end (topmost) to the beginning
+        for (let i = editorState.netPolygons.length - 1; i >= 0; i--) {
+            const poly = editorState.netPolygons[i];
+            if (poly.isPointInside(worldMousePos)) {
+                clickedPolygon = poly; // Found a clicked polygon
+                break; // Stop searching once the topmost is found
+            }
+        }
+
+        // Handle polygon selection and start drag
+        if (clickedPolygon) {
+            bringToFront(clickedPolygon); // Move the clicked polygon to the end of the array for drawing order
+            // Deselect previously selected polygons if the clicked one is different
+            if (editorState.selectedPolygonId !== clickedPolygon.id) {
+                deselectAllPolygons(); // Deselect all others
+                clickedPolygon.isSelected = true; // Select the clicked one
+            }
+            // Calculate drag offset
+            const dragOffsetX = worldMousePos.x - clickedPolygon.centerPosition.x;
+            const dragOffsetY = worldMousePos.y - clickedPolygon.centerPosition.y;
+            updateState({
+                selectedPolygonId: clickedPolygon.id, // Set the newly selected polygon as dragged
+                draggedPolygon: clickedPolygon,
+                dragOffsetX: dragOffsetX,
+                dragOffsetY: dragOffsetY,
+                isDragging: true,
+            });
+            canvas.style.cursor = "grabbing"; // Change cursor
+            console.log(
+                `Selected/Dragging polygon ID: ${editorState.selectedPolygonId}`,
+            );
+        } else {
+            // If no polygon was clicked, deselect all polygons
+            if (deselectAllPolygons()) {
+                drawNet(); // Redraw if selection changed
+            }
+            // Ensure dragging state is false if no polygon was clicked
+            updateState({ draggedPolygon: null, isDragging: false });
+        }
+
+        // Reset snap target state on any mousedown that isn't an active drag/place
+        updateState({ currentSnapTarget: null });
+
+        // Redraw the net to show selection changes or clear highlights
+        drawNet();
+
+    } // End of left mouse button actions
+}
+
+
 export function handleMouseMove(event) {
     if (!canvas) return;
     const rawMousePos = getRawMousePos(canvas, event);
     const worldMousePos = getMousePos(canvas, event);
+
+    // Existing logic for active panning
     if (editorState.isActivelyPanning) {
         const dx = rawMousePos.x - editorState.panStartX;
         const dy = rawMousePos.y - editorState.panStartY;
@@ -923,77 +1215,116 @@ export function handleMouseMove(event) {
             panStartX: rawMousePos.x,
             panStartY: rawMousePos.y,
         });
-        drawNet();
-        return;
+        drawNet(); // Redraw during panning
+        return; // Stop here if panning
     }
+
+    // Existing logic for dragging a polygon
     if (editorState.isDragging && editorState.draggedPolygon) {
         const newCenter = {
             x: worldMousePos.x - editorState.dragOffsetX,
             y: worldMousePos.y - editorState.dragOffsetY,
         };
-        editorState.draggedPolygon.updatePosition(newCenter); // Direct mutation
+        editorState.draggedPolygon.updatePosition(newCenter); // Update polygon position (mutate directly)
+
+        // Find a snap target for the dragged polygon
         const snapTarget = findSnapTarget(editorState.draggedPolygon);
-        updateState({ currentSnapTarget: snapTarget });
-        drawNet();
+        updateState({ currentSnapTarget: snapTarget }); // Update snap target state
+
+        drawNet(); // Redraw to show dragging and potential snap highlights
     }
+    // Note: Mouse move doesn't interact with the context menu visibility directly,
+    // but if a drag was in progress and the mouse leaves the canvas, handleMouseLeave will handle it.
 }
 export function handleMouseUp(event) {
     if (!canvas) return;
-    if (editorState.isActivelyPanning) {
-        updateState({ isActivelyPanning: false });
-        canvas.classList.remove("pan-grabbing");
-        if (editorState.isPanning) canvas.classList.add("pan-grab");
-        else {
-            canvas.classList.remove("pan-grab");
-            canvas.style.cursor = "default";
+
+     // --- Only handle left mouse button for these actions ---
+     if (event.button === 0) {
+
+        // Existing logic for ending active panning
+        if (editorState.isActivelyPanning) {
+            updateState({ isActivelyPanning: false }); // End active panning
+            canvas.classList.remove("pan-grabbing"); // Update cursor class
+            // Set cursor back to grab if still in panning mode, or default
+            canvas.style.cursor = editorState.isPanning ? "grab" : "default";
+            return; // Stop here if ending panning
         }
-        return;
-    }
-    if (editorState.isDragging) {
-        if (editorState.currentSnapTarget) {
-            finalizeSnap(editorState.currentSnapTarget);
+
+        // Existing logic for finishing drag
+        if (editorState.isDragging) {
+            // If there's a snap target, finalize the snap connection
+            if (editorState.currentSnapTarget) {
+                finalizeSnap(editorState.currentSnapTarget); // Finalizes position, rotation, connections, and redraws
+            } else {
+                 // If no snap occurred, just ensure position is updated and redraw
+                 // (updatePosition already happened in mousemove, but redraw is needed to clear drag visuals)
+                 drawNet();
+            }
+
+            // Reset dragging state
+            updateState({
+                isDragging: false,
+                draggedPolygon: null,
+                currentSnapTarget: null, // Clear snap target state after mouse up
+            });
+            canvas.style.cursor = editorState.isPanning ? "grab" : "default"; // Reset cursor
+            console.log("Stopped dragging.");
+            // drawNet() is called either by finalizeSnap or here if no snap.
         }
-        updateState({
-            isDragging: false,
-            draggedPolygon: null,
-            currentSnapTarget: null,
-        }); // Clear snap target here too
-        canvas.style.cursor = editorState.isPanning ? "grab" : "default";
-        console.log("Stopped dragging.");
-        // finalizeSnap calls drawNet, so only call if no snap occurred? Or call always for safety.
-        drawNet();
-    }
-    if (canvas.style.cursor === "copy") {
-        canvas.style.cursor = editorState.isPanning ? "grab" : "default";
-        updateState({ currentPaletteSelection: null });
-    }
+
+        // Existing logic for cancelling palette placement if mouse was in copy mode
+        if (canvas.style.cursor === "copy") {
+            canvas.style.cursor = editorState.isPanning ? "grab" : "default"; // Reset cursor
+            updateState({ currentPaletteSelection: null }); // Cancel palette selection
+            // No redraw needed here unless a new polygon was placed (handled in placeNewPolygon)
+        }
+     } // End of left mouse button actions
 }
 export function handleMouseLeave(event) {
+    // If actively panning and mouse leaves, stop panning
     if (editorState.isActivelyPanning) {
         updateState({ isActivelyPanning: false });
         canvas.classList.remove("pan-grabbing");
+        // Reset cursor based on panning mode
         canvas.style.cursor = editorState.isPanning ? "grab" : "default";
     }
+
+    // If dragging a polygon and mouse leaves, simulate mouse up to finalize the drag
+    // This uses a synthetic event object with button 0 to trigger the left-click mouseup logic
     if (editorState.isDragging && editorState.draggedPolygon) {
-        handleMouseUp(event);
+        handleMouseUp({ button: 0 });
         console.log("Mouse left canvas during drag, action stopped.");
     }
+
+
+    // If in palette placement mode and mouse leaves, cancel placement
     if (editorState.currentPaletteSelection !== null) {
         console.log("Placement cancelled (mouse left canvas).");
         updateState({ currentPaletteSelection: null, draggedPolygon: null });
+        // Reset cursor
         if (canvas)
             canvas.style.cursor = editorState.isPanning ? "grab" : "default";
-        drawNet();
+        drawNet(); // Redraw to remove potential preview if it existed
     }
+
+    // If a snap target was highlighted, clear it when mouse leaves
     if (editorState.currentSnapTarget) {
         updateState({ currentSnapTarget: null });
-        drawNet();
+        drawNet(); // Redraw to remove highlight
     }
 }
+
+
 export function handleKeyDown(event) {
+    // Hide the color context menu on any key press
+    hideColorContextMenu();
+
+    // Check for Spacebar press to toggle panning mode
     if (event.code === "Space" || event.key === " ") {
-        if (!editorState.isPanning) {
-            updateState({ isPanning: true });
+        if (!editorState.isPanning) { // If not already panning mode
+            updateState({ isPanning: true }); // Enter panning mode
+            // Update cursor if not currently dragging or actively panning
             if (
                 !editorState.isDragging &&
                 !editorState.isActivelyPanning &&
@@ -1002,56 +1333,73 @@ export function handleKeyDown(event) {
                 canvas.classList.add("pan-grab");
             }
         }
-        event.preventDefault();
-        return;
+        event.preventDefault(); // Prevent default spacebar action (like scrolling)
+        return; // Stop here if spacebar was pressed
     }
+
+    // Get the currently selected polygon
     const selectedPoly = getSelectedPolygon();
-    if (!selectedPoly) return;
-    let needsRedraw = false;
-    const rotationStep = 5 * (Math.PI / 180);
+    if (!selectedPoly) return; // Do nothing if no polygon is selected
+
+    let needsRedraw = false; // Flag to indicate if a redraw is needed
+    const rotationStep = 5 * (Math.PI / 180); // Rotation amount in radians (5 degrees)
+
+    // Check for 'r' or 'R' key for right rotation
     if (event.key === "r" || event.key === "R") {
-        selectedPoly.updateRotation(selectedPoly.rotationAngle + rotationStep);
+        selectedPoly.updateRotation(selectedPoly.rotationAngle + rotationStep); // Increase rotation angle
         console.log(`Rotated polygon ${selectedPoly.id} right`);
-        breakConnections(selectedPoly);
-        needsRedraw = true;
-    } else if (event.key === "l" || event.key === "L") {
-        selectedPoly.updateRotation(selectedPoly.rotationAngle - rotationStep);
-        console.log(`Rotated polygon ${selectedPoly.id} left`);
-        breakConnections(selectedPoly);
+        breakConnections(selectedPoly); // Break connections on rotation
         needsRedraw = true;
     }
+    // Check for 'l' or 'L' key for left rotation
+    else if (event.key === "l" || event.key === "L") {
+        selectedPoly.updateRotation(selectedPoly.rotationAngle - rotationStep); // Decrease rotation angle
+        console.log(`Rotated polygon ${selectedPoly.id} left`);
+        breakConnections(selectedPoly); // Break connections on rotation
+        needsRedraw = true;
+    }
+
+    // Check for Delete or Backspace key for deletion
     if (event.key === "Delete" || event.key === "Backspace") {
-        const deletedId = editorState.selectedPolygonId;
+        const deletedId = editorState.selectedPolygonId; // Get ID of the selected polygon
         console.log(`Attempting to delete polygon ${deletedId}`);
-        breakConnections(selectedPoly, true); // Break connections involving the deleted polygon
-        if (removePolygonById(deletedId)) {
+        breakConnections(selectedPoly, true); // Break all connections involving this polygon before deleting
+        if (removePolygonById(deletedId)) { // Remove the polygon from the state array
+            // Reset selection and dragging state
             updateState({
                 selectedPolygonId: null,
                 draggedPolygon: null,
                 isDragging: false,
-                currentSnapTarget: null,
+                currentSnapTarget: null, // Clear snap target state
             });
             console.log(`Deleted polygon ID ${deletedId}`);
-            needsRedraw = true;
+            needsRedraw = true; // Indicate redraw is needed
         }
     }
+
+    // If any changes were made that require a redraw, call drawNet
     if (needsRedraw) {
-        updateState({ currentSnapTarget: null });
+        updateState({ currentSnapTarget: null }); // Clear snap target state before redraw
         drawNet();
     }
 }
 export function handleKeyUp(event) {
+    // Check for Spacebar key up to exit panning mode
     if (event.code === "Space" || event.key === " ") {
-        updateState({ isPanning: false });
+        // We only update panning state here; the actual active panning stops on mouse up/leave.
+        updateState({ isPanning: false }); // Exit panning mode
+
+        // Update cursor appearance if not actively panning anymore and not dragging
         if (!editorState.isActivelyPanning && canvas) {
             canvas.classList.remove("pan-grab");
-            canvas.classList.remove("pan-grabbing");
+            canvas.classList.remove("pan-grabbing"); // Remove grabbing cursor if active
+            // Set cursor back to default, unless dragging is in progress
             canvas.style.cursor =
                 editorState.isDragging && editorState.draggedPolygon
                     ? "grabbing"
                     : "default";
         }
-        event.preventDefault();
+        event.preventDefault(); // Prevent default spacebar action
     }
 }
 function breakConnections(polygon, breakIncoming = false) {
@@ -1059,30 +1407,43 @@ function breakConnections(polygon, breakIncoming = false) {
     console.warn(
         `Breaking connections for polygon ${polygon.id} due to manual transform.`,
     );
+    // Iterate through the polygon's own connections
     for (const edgeIndex in polygon.connections) {
-        // Break outgoing
+        // Get the connection info for this edge
         const conn = polygon.connections[edgeIndex];
+        // Find the neighbor polygon based on the connection info
         const neighbor = getPolygonById(conn.polyId);
+
+        // If the neighbor exists AND the neighbor's connection back to this polygon exists and is correct
         if (
             neighbor &&
             neighbor.connections[conn.edgeIndex]?.polyId === polygon.id
         ) {
-            delete neighbor.connections[conn.edgeIndex];
             console.log(
-                ` Broke connection from neighbor ${neighbor.id}[${conn.edgeIndex}]`,
+                ` Broke connection from neighbor ${neighbor.id}[${conn.edgeIndex}] to ${polygon.id}[${edgeIndex}]`,
             );
+            // Delete the connection from the neighbor's side
+            delete neighbor.connections[conn.edgeIndex];
         }
     }
+    // Clear all connections from the current polygon's side
     polygon.connections = {};
+
+    // If breakIncoming is true, also iterate through ALL other polygons
+    // and break any connections they might have pointing TO this polygon.
     if (breakIncoming) {
-        // Break incoming
         editorState.netPolygons.forEach((otherPoly) => {
+            // Skip the polygon itself
             if (otherPoly.id === polygon.id) return;
+
+            // Iterate through the other polygon's connections
             for (const edgeIndex in otherPoly.connections) {
+                // If this connection points to the polygon being processed
                 if (otherPoly.connections[edgeIndex].polyId === polygon.id) {
+                    // Delete the connection from the other polygon's side
                     delete otherPoly.connections[edgeIndex];
                     console.log(
-                        ` Broke connection from other ${otherPoly.id}[${edgeIndex}]`,
+                        ` Broke connection from other ${otherPoly.id}[${edgeIndex}] to ${polygon.id}`,
                     );
                 }
             }
@@ -1092,6 +1453,7 @@ function breakConnections(polygon, breakIncoming = false) {
 /////////////////////////
 // end of interaction.js section
 /////////////////////////
+
 
 /////////////////////////
 // start of snapping.js section
@@ -1376,7 +1738,6 @@ export function handleFileLoad(event) {
                     ...DEFAULT_COLORS,
                 },
             });
-            createColorPickers();
             console.log(
                 `App 1 Net loaded. ${editorState.netPolygons.length} polygons.`,
             );
@@ -1793,10 +2154,10 @@ function initFoldingViewer() {
     }
 }
 
-// --- Event Listeners Setup (Updated) ---
-// --- Event Listeners Setup (Gets controls, sets initial state) ---
+
+// --- Event Listeners Setup (Gets controls, sets initial state, adds right-click listener) ---
 function setupEventListeners() {
-    // ... (App 1 listeners as before) ...
+    // --- App 1 (2D Editor) Listeners ---
     saveButton.addEventListener("click", saveNetToFile);
     loadFileInput.addEventListener("change", handleFileLoad);
     clearButton.addEventListener("click", clearNet);
@@ -1804,16 +2165,43 @@ function setupEventListeners() {
     switchTo3DButton.addEventListener("click", switchToFoldingView);
     backTo2DButton.addEventListener("click", () => show2DView(true));
 
-    // THESE LINES WERE MISSING FROM setupEventListeners in the previous response:
+    // Mouse listeners for 2D canvas interaction (pan, drag, place)
     canvas.addEventListener("mousedown", handleMouseDown);
     canvas.addEventListener("mousemove", handleMouseMove);
     canvas.addEventListener("mouseup", handleMouseUp);
     canvas.addEventListener("mouseleave", handleMouseLeave);
 
-    // ---> Global Listeners Section <---
-    window.addEventListener("keydown", handleKeyDown); // <<< Listener IS attached here
+    // --- ADD Right-Click Context Menu Listener ---
+    // Only add the listener if the context menu element was found
+    if (colorContextMenu) {
+       canvas.addEventListener("contextmenu", handleContextMenu);
+    } else {
+       console.warn("Context menu element not found, right-click color feature disabled.");
+    }
+
+
+    // --- Global Listeners ---
+    window.addEventListener("keydown", handleKeyDown); // Keyboard input (rotate, delete, pan toggle)
     window.addEventListener("keyup", handleKeyUp);
-    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("resize", resizeCanvas); // Window resize handling
+
+    // --- Listener to hide context menu on any LEFT click outside it ---
+    // Use the entire window document to catch left clicks anywhere
+    window.addEventListener('click', (event) => {
+        // Check if it was a left click (button === 0)
+        if (event.button === 0) {
+            // Check if the color context menu is visible (and was found during init)
+            if (colorContextMenu && colorContextMenu.style.display !== 'none') {
+                // Check if the click target is outside the menu itself
+                const isClickInsideMenu = colorContextMenu.contains(event.target);
+                if (!isClickInsideMenu) {
+                    hideColorContextMenu(); // Hide the menu on left click outside
+                }
+                 // If the left click was inside the menu, handleColorMenuItemClick will handle it.
+            }
+        }
+    });
+
 
     // --- Get Folding Control Elements ---
     foldingState.foldingControlsDiv =
@@ -1828,127 +2216,65 @@ function setupEventListeners() {
 
     // --- Set Initial UI State for Folding Controls ---
     if (foldingState.speedSlider) {
+        // Set initial speed value
         foldingState.speedSlider.value = foldingState.currentAnimationDuration;
         if (foldingState.speedValueSpan) {
+            // Display initial speed value
             foldingState.speedValueSpan.textContent = `${foldingState.currentAnimationDuration} ms`;
         }
     } else {
-        console.warn("#speedSlider3D not found");
+        console.warn("[EVENT SETUP] #speedSlider3D not found");
     }
 
     if (foldingState.pauseButton) {
-        foldingState.pauseButton.disabled = true; // Start disabled
+        foldingState.pauseButton.disabled = true; // Start paused button disabled
+        foldingState.pauseButton.textContent = "Pause"; // Initial text
     } else {
-        console.warn("#pauseButton3D not found");
+        console.warn("[EVENT SETUP] #pauseButton3D not found");
     }
 
     if (foldingState.foldButton) {
-        foldingState.foldButton.disabled = true; // Start disabled until net loaded
-        foldingState.foldButton.textContent = "Fold";
+        foldingState.foldButton.disabled = true; // Start fold button disabled until net loaded
+        foldingState.foldButton.textContent = "Fold"; // Initial text
     } else {
-        console.warn("#foldButton3D not found");
+        console.warn("[EVENT SETUP] #foldButton3D not found");
     }
 
     if (foldingState.toggleNormalsCheckbox) {
-        foldingState.toggleNormalsCheckbox.checked = false; // Start unchecked
+        foldingState.toggleNormalsCheckbox.checked = false; // Start normals checkbox unchecked
     } else {
-        console.warn("#toggleNormals3D not found");
+        console.warn("[EVENT SETUP] #toggleNormals3D not found");
     }
 
     if (foldingState.infoDisplay) {
-        foldingState.infoDisplay.textContent = "Create/Export Net"; // Initial text
+        foldingState.infoDisplay.textContent = "Create/Export Net"; // Initial info text
     } else {
-        console.warn("#foldingInfo not found");
+        console.warn("[EVENT SETUP] #foldingInfo not found");
     }
 
-    // Ensure folding controls container is initially hidden using class
+    // Ensure folding controls container is initially hidden using the CSS class
     if (foldingState.foldingControlsDiv) {
         foldingState.foldingControlsDiv.classList.add("hidden"); // Add hidden class
     } else {
-        console.warn("#foldingControls div not found");
+        console.warn("[EVENT SETUP] #foldingControls div not found!");
     }
 
     // --- Add Listeners for Folding Controls ---
     if (foldingState.foldButton)
-        foldingState.foldButton.addEventListener("click", toggleFolding);
+        foldingState.foldButton.addEventListener("click", toggleFolding); // Toggle folding/unfolding animation
     if (foldingState.pauseButton)
-        foldingState.pauseButton.addEventListener("click", toggleFoldingPause);
+        foldingState.pauseButton.addEventListener("click", toggleFoldingPause); // Pause/resume animation
     if (foldingState.speedSlider)
-        foldingState.speedSlider.addEventListener("input", handleSpeedChange);
+        foldingState.speedSlider.addEventListener("input", handleSpeedChange); // Change animation speed
     if (foldingState.toggleNormalsCheckbox)
         foldingState.toggleNormalsCheckbox.addEventListener(
             "change",
-            toggleNormalHelpersVisibility,
+            toggleNormalHelpersVisibility, // Toggle visibility of normal arrows
         );
 
-    console.log("Event listeners set up (including folding controls).");
+    console.log("Event listeners set up (including folding controls and context menu).");
 }
 
-// --- Load Net Data into Folding State ---
-function loadNet(event) {
-    const file = event.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = (e) => {
-        try {
-            const netData = JSON.parse(e.target.result);
-            if (!netData.placedShapes)
-                throw new Error("Invalid net file format.");
-
-            // --- Clear existing state ---
-            console.log("loadNet: initializing placedShapes");
-            placedShapes = []; // Clear 2D shapes
-            connections = []; // Clear 2D connections
-            selectedShapeId = null;
-            // Clear existing 3D state to prevent conflicts with the new 2D net
-            clearFoldingSceneGeometry(); // <--- ADD THIS CALL
-            // --- End clear state ---
-
-            // --- Load new 2D state ---
-            netData.placedShapes.forEach((shapeData) => {
-                const radius = calculateRadiusForSideLength(
-                    shapeData.sides,
-                    TARGET_SIDE_LENGTH,
-                );
-                const baseVertices = generatePolygonVertices(
-                    shapeData.sides,
-                    radius,
-                );
-                placedShapes.push({
-                    ...shapeData,
-                    baseVertices: baseVertices, // Regenerate base vertices
-                });
-            });
-
-            connections = netData.connections || [];
-            nextShapeId =
-                netData.nextShapeId ||
-                Math.max(0, ...placedShapes.map((s) => s.id)) + 1;
-            viewTransform = netData.viewTransform || { x: 0, y: 0, scale: 1.0 }; // Load view state or reset
-
-            isDragging = false;
-            isPanning = false;
-            console.log("Net loaded successfully.");
-            drawNet(); // Draw the newly loaded net
-            // --- End load new state ---
-        } catch (error) {
-            console.error("Failed to load or parse net file:", error);
-            alert(`Error loading net file: ${error.message}`);
-            // Also clear 3D scene on error? Maybe, depends on desired state after failed load.
-            // clearFoldingSceneGeometry();
-        } finally {
-            // Reset the input value so the same file can be loaded again if needed
-            event.target.value = null;
-        }
-    };
-    reader.onerror = () => {
-        console.error("Error reading file:", reader.error);
-        alert("Error reading file.");
-        event.target.value = null; // Reset input on error too
-    };
-    reader.readAsText(file);
-}
 
 // --- Load Net Data into Folding State ---
 function loadNetForFolding(netData) {
@@ -2165,11 +2491,21 @@ function createFoldingNetGeometry(netData) {
             baseGeom.attributes.position.count === 0
         )
             throw new Error("Base geometry creation failed.");
-        const baseMat = new THREE.MeshStandardMaterial({
-            color: baseFaceColorValue,
-            side: THREE.DoubleSide,
-            roughness: 0.8,
-        });
+
+	let baseMat;
+	if (pureColor) {
+            baseMat = new THREE.MeshBasicMaterial({
+		color: baseFaceColorValue,
+		side: THREE.DoubleSide,
+	    });
+	}
+	else {
+            baseMat = new THREE.MeshStandardMaterial({
+		color: baseFaceColorValue,
+		side: THREE.DoubleSide,
+		roughness: 0.8,
+            });
+	}
         foldingState.f1Mesh = new THREE.Mesh(baseGeom, baseMat);
         foldingState.scene.add(foldingState.f1Mesh);
 
@@ -2348,11 +2684,20 @@ function createFoldingNetGeometry(netData) {
 	    )
 		throw new Error(`Geometry creation failed for F${i}`);
 	    const colorValue = parseColorFolding(colorInput);
-	    const material = new THREE.MeshStandardMaterial({
-		color: colorValue,
-		side: THREE.DoubleSide,
-		roughness: 0.8,
-	    });
+
+	    let material;
+	    if (pureColor) {
+		material = new THREE.MeshBasicMaterial({
+		    color: colorValue,
+		    side: THREE.DoubleSide,
+		});
+	    } else {
+		material = new THREE.MeshStandardMaterial({
+		    color: colorValue,
+		    side: THREE.DoubleSide,
+		    roughness: 0.8,
+		});
+	    }
 	    const faceMesh = new THREE.Mesh(geometry, material);
 	    faceMesh.position.set(0, 0, 0);
 	    pivot.add(faceMesh);
@@ -2385,268 +2730,6 @@ function createFoldingNetGeometry(netData) {
         clearFoldingSceneGeometry();
     }
 }
-
-function createFoldingNetGeometry2(netData) {
-    // Adapted from script.js, uses foldingState
-    console.log("Creating folding net geometry...");
-    const L = foldingState.sideLength;
-    clearFoldingSceneGeometry(); // Clear specific folding geometry
-
-    try {
-        const baseFaceSides = netData.baseFace.noSides;
-        const baseFaceColorValue = parseColorFolding(netData.baseFace.color); // Use specific parseColor
-        foldingState.allVertices[1] = calculateBaseRegularPolygonVertices(
-            baseFaceSides,
-            L,
-        ); // Store base at key 1
-        foldingState.allVertices[1].numSides = baseFaceSides;
-        const baseGeom = createRegularPolygonGeometry(
-            foldingState.allVertices[1],
-        );
-        if (
-            !baseGeom.attributes.position ||
-            baseGeom.attributes.position.count === 0
-        )
-            throw new Error("Base geometry creation failed.");
-        const baseMat = new THREE.MeshStandardMaterial({
-            color: baseFaceColorValue,
-            side: THREE.DoubleSide,
-            roughness: 0.8,
-        });
-        foldingState.f1Mesh = new THREE.Mesh(baseGeom, baseMat);
-        foldingState.scene.add(foldingState.f1Mesh); // Add to folding scene
-
-        const f1LocalCenter = calculateLocalCenter(foldingState.allVertices[1]);
-        const f1LocalNormal = calculateLocalNormal(foldingState.allVertices[1]);
-        const arrowHelper1 = new THREE.ArrowHelper(
-            f1LocalNormal,
-            f1LocalCenter,
-            L / 2,
-            0x000000,
-            L / 4,
-            L / 8,
-        );
-        foldingState.f1Mesh.add(arrowHelper1); // Add helper to mesh
-        foldingState.normalHelpers[1] = arrowHelper1;
-
-        const connections = netData.connections;
-        const tempVec1 = new THREE.Vector3();
-        const tempVec2 = new THREE.Vector3();
-        const Q = new THREE.Vector3();
-        const tempMatrix = new THREE.Matrix4();
-        const tempQuatInv = new THREE.Quaternion();
-        const tempWorldPos = new THREE.Vector3();
-
-        for (const conn of connections) {
-            // Use NEW IDs from the renumbered JSON (conn.from and conn.to start from 1 or 2)
-            const i = conn.from; // ID of polygon being added (e.g., 2, 3, ...)
-            const j = conn.to; // ID of parent polygon (e.g., 1 for base, or 2, 3, ...)
-            const k = conn.noSides;
-            const colorInput = conn.color;
-
-            // Validation check (already fixed to allow j=0, but now j should be >= 1)
-            if (
-                typeof i !== "number" ||
-                typeof j !== "number" ||
-                j < 1 ||
-                typeof k !== "number" ||
-                k < 3
-            ) {
-                console.warn(
-                    `Folding: Skipping invalid connection definition (IDs should be >= 1):`,
-                    conn,
-                );
-                continue;
-            }
-
-            let parentVertices = foldingState.allVertices[j]; // Directly use ID j (should be >= 1)
-            if (!parentVertices?.numSides) {
-                console.error(
-                    `Folding Net Gen Error: Parent F${j} vertices not found for F${i}`,
-                );
-                continue;
-            }
-
-            const Fi_base_vertices = calculateBaseRegularPolygonVertices(k, L);
-            const Fi_M_vertex_index = conn.fromEdge[0];
-            const Fi_N_vertex_index = conn.fromEdge[1];
-            if (
-                Fi_M_vertex_index === undefined ||
-                Fi_M_vertex_index < 0 ||
-                Fi_M_vertex_index >= k ||
-                Fi_N_vertex_index === undefined ||
-                Fi_N_vertex_index < 0 ||
-                Fi_N_vertex_index >= k
-            ) {
-                console.warn(
-                    `Folding: Skipping F${i}: Invalid fromEdge indices ${conn.fromEdge}`,
-                );
-                continue;
-            }
-            const W = tempVec1.subVectors(
-                Fi_base_vertices[Fi_N_vertex_index],
-                Fi_base_vertices[Fi_M_vertex_index],
-            );
-
-            const parentNumSides = parentVertices.numSides;
-            const Fj_R_vertex_index = conn.toEdge[0];
-            const Fj_S_vertex_index = conn.toEdge[1];
-            if (
-                Fj_R_vertex_index === undefined ||
-                Fj_R_vertex_index < 0 ||
-                Fj_R_vertex_index >= parentNumSides ||
-                Fj_S_vertex_index === undefined ||
-                Fj_S_vertex_index < 0 ||
-                Fj_S_vertex_index >= parentNumSides
-            ) {
-                console.warn(
-                    `Folding: Skipping F${i}: Invalid toEdge indices ${conn.toEdge} for parent F${j}`,
-                );
-                continue;
-            }
-            const Fj_R_vertex = parentVertices[Fj_R_vertex_index];
-            const Fj_S_vertex = parentVertices[Fj_S_vertex_index];
-            if (!Fj_R_vertex || !Fj_S_vertex) {
-                console.error(
-                    `Folding Net Gen Error: Parent F${j} R/S vertices missing for F${i}`,
-                );
-                continue;
-            }
-            const V = tempVec2.subVectors(Fj_S_vertex, Fj_R_vertex);
-
-            const dot = W.x * V.x + W.z * V.z;
-            const det = W.x * V.z - W.z * V.x;
-            let alpha = Math.atan2(det, dot);
-            if (W.lengthSq() < 1e-9 || V.lengthSq() < 1e-9) alpha = 0;
-
-            const cosA = Math.cos(alpha);
-            const sinA = Math.sin(alpha);
-            const Fi_rotated_vertices = Fi_base_vertices.map(
-                (v) =>
-                    new THREE.Vector3(
-                        v.x * cosA - v.z * sinA,
-                        0,
-                        v.x * sinA + v.z * cosA,
-                    ),
-            );
-            const Fi_M_rotated_vertex = Fi_rotated_vertices[Fi_M_vertex_index];
-            Q.subVectors(Fj_R_vertex, Fi_M_rotated_vertex);
-            const Fi_final_world_vertices = Fi_rotated_vertices.map((v) =>
-                v.clone().add(Q),
-            );
-
-            foldingState.allVertices[i] = Fi_final_world_vertices;
-            foldingState.allVertices[i].numSides = k;
-            // Store connecting edge indices for potential future use (e.g., fold direction)
-            foldingState.allVertices[i].conn = {
-                R_idx_local: Fi_M_vertex_index,
-                S_idx_local: Fi_N_vertex_index,
-                parent_R_idx: Fj_R_vertex_index, // XXX
-                parent_S_idx: Fj_S_vertex_index, // XXX
-            };
-
-            // --- Create Pivot and Mesh ---
-            const fi_worldVertices = foldingState.allVertices[i];
-            let parentObject =
-                j === 1 ? foldingState.scene : foldingState.pivots[j]; // Get parent from folding state
-            if (!parentObject) {
-                console.error(
-                    `Folding Net Gen Error: Parent object (ID ${j}) not found for F${i}`,
-                );
-                continue;
-            }
-            const fj_R_target = Fj_R_vertex;
-            const fj_S_target = Fj_S_vertex; // These are vertices on the parent's local coordinate system
-            const edgeMidpointWorld = fj_R_target
-                .clone()
-                .add(fj_S_target)
-                .multiplyScalar(0.5); // Midpoint in parent's local space
-            const edgeAxisWorld = fj_R_target
-                .clone()
-                .sub(fj_S_target)
-                .normalize(); // Axis in parent's local space
-
-            const pivot = new THREE.Group();
-            foldingState.pivots[i] = pivot; // Store pivot in folding state
-            parentObject.updateWorldMatrix(true, true); // Ensure parent matrix is up-to-date
-            tempMatrix.copy(parentObject.matrixWorld).invert(); // Get inverse world matrix of parent
-            pivot.position.copy(edgeMidpointWorld); // Position pivot at edge midpoint (relative to parent)
-            //   pivot.position.copy(edgeMidpointWorld).applyMatrix4(tempMatrix); // XXX
-
-            tempQuatInv
-                .copy(parentObject.getWorldQuaternion(new THREE.Quaternion()))
-                .invert(); // Inverse world quaternion of parent
-            pivot.userData.axis = edgeAxisWorld.clone(); // Store axis relative to pivot's parent
-	    // pivot.userData.axis = edgeAxisWorld
-            //     .clone()
-            //     .applyQuaternion(tempQuatInv);  // XXX
-
-            pivot.quaternion.identity();
-            parentObject.add(pivot); // Add pivot to parent
-
-            // Calculate local vertices relative to the pivot
-            pivot.updateWorldMatrix(true, false); // Ensure pivot matrix is up-to-date
-            pivot.getWorldPosition(tempWorldPos); // Get pivot's world position
-            const pivotWorldQuaternionInv = pivot
-                .getWorldQuaternion(new THREE.Quaternion())
-                .invert(); // Pivot's inverse world rotation
-            // Transform final WORLD vertices of the face into the PIVOT's LOCAL space
-            const fi_localVertices = fi_worldVertices.map((worldVert) =>
-                worldVert
-                    .clone()
-                    .sub(tempWorldPos)
-                    .applyQuaternion(pivotWorldQuaternionInv),
-            );
-
-            const geometry = createRegularPolygonGeometry(fi_localVertices);
-            if (
-                !geometry.attributes.position ||
-                geometry.attributes.position.count === 0
-            )
-                throw new Error(`Geometry creation failed for F${i}`);
-            const colorValue = parseColorFolding(colorInput); // Use folding parser
-            const material = new THREE.MeshStandardMaterial({
-                color: colorValue,
-                side: THREE.DoubleSide,
-                roughness: 0.8,
-            });
-            const faceMesh = new THREE.Mesh(geometry, material);
-            // faceMesh.position.set(0, 0, 0); XXX
-            pivot.add(faceMesh); // Add mesh as child of pivot
-
-            // Add normal helper relative to pivot
-            const localCenter = calculateLocalCenter(fi_localVertices);
-            const localNormal = calculateLocalNormal(fi_localVertices);
-            const arrowHelper = new THREE.ArrowHelper(
-                localNormal,
-                localCenter,
-                L / 2,
-                0x000000,
-                L / 4,
-                L / 8,
-            );
-            pivot.add(arrowHelper);
-            foldingState.normalHelpers[i] = arrowHelper; // Store in folding state
-        }
-        console.log("Finished creating folding net geometry.");
-
-        setNormalHelpersVisibility(
-            foldingState.toggleNormalsCheckbox
-                ? foldingState.toggleNormalsCheckbox.checked
-                : false,
-        ); // Set initial visibility
-        // Adjust camera to view the newly created net
-        fitFoldingCameraToNet();
-    } catch (error) {
-        console.error("Error during folding net creation:", error);
-        alert(
-            "An error occurred while creating the folding net geometry. Check console.",
-        );
-        clearFoldingSceneGeometry(); // Clear scene on error
-    }
-}
-
-// --- End Replace ---
 
 // --- Replace entire function (Manual BBox, Aspect Corrected Dist, Origin Target) ---
 function fitFoldingCameraToNet() {
@@ -3139,258 +3222,408 @@ function stopFoldingAnimation() {
     }
 }
 
-////////////////////////////////////////////////////////////////////////////
-// END OF FOLDING LOGIC
-////////////////////////////////////////////////////////////////////////////
+/////////////////////////
+// end of folding logic
+/////////////////////////
 
-///////////////////////////////////
-// start of topological export section (Already defined above)
-///////////////////////////////////
-// function convertNetToTopologicalFormat() { ... }
-// function downloadJson(data, filename) { ... }
-// function exportTopologicalNet() { ... }
-///////////////////////////////////
-// end of topological export section
-///////////////////////////////////
 
 /////////////////////////
 // start of view switching section
 /////////////////////////
 
-// --- View Switching Logic (Uses classes now) ---
+// --- Switches the display from the 2D editor to the 3D folding viewer ---
 export function switchToFoldingView() {
     console.log("[ViewSwitch] Entering switchToFoldingView...");
     console.log("[DEBUG] Attempting to switch to Folding View...");
+
+    // Check if essential DOM elements are available for view switching
     if (!canvas || !threeContainer || !backTo2DButton || !switchTo3DButton) {
-        /*...*/ return;
-    }
-    if (editorState.netPolygons.length === 0) {
-        /*...*/ return;
+        console.error("[ViewSwitch] Missing essential DOM elements for view switching. Aborting switch.");
+        alert("Application error: Cannot find view elements.");
+        return; // Abort if elements are missing
     }
 
-    // 1. Generate topological data
+    // Before switching, check if there are any polygons in the net to fold
+    if (editorState.netPolygons.length === 0) {
+         alert("Add polygons to the net before folding.");
+         console.log("[ViewSwitch] No polygons in net, folding cancelled.");
+         return; // Abort if net is empty
+    }
+
+    // --- Hide the color context menu if open ---
+    hideColorContextMenu();
+
+
+    // --- 1. Generate topological data from the current 2D net ---
     console.log("[DEBUG] Generating topological data...");
-    console.log("[ViewSwitch] Step 1: Generating topological data..."); // LOG
+    console.log("[ViewSwitch] Step 1: Generating topological data...");
     const topologicalData = convertNetToTopologicalFormat();
     if (!topologicalData) {
-        /*...*/ return;
+        // Error message is already shown inside convertNetToTopologicalFormat
+        console.error("[ViewSwitch] Step 1 Failed: Topological data generation failed. Aborting switch.");
+        return; // Abort if topological data could not be generated
     }
-    console.log("[ViewSwitch] Step 1 Complete."); // LOG
+    console.log("[ViewSwitch] Step 1 Complete.");
     console.log("[DEBUG] Topological data generated.");
 
-    // 2. Ensure Folding Viewer is initialized
-    console.log("[ViewSwitch] Step 2: Checking/Initializing Folding Viewer..."); // LOG
+
+    // --- 2. Ensure the 3D Folding Viewer is initialized ---
+    console.log("[ViewSwitch] Step 2: Checking/Initializing Folding Viewer...");
+    // If not initialized, call the initialization function
     if (!foldingState.threeInitialized) initFoldingViewer();
+    // Check again after attempting initialization
     if (!foldingState.threeInitialized) {
-        /*...*/ return;
+         console.error("[ViewSwitch] Step 2 Failed: Folding Viewer Initialization failed. Aborting switch.");
+         // Error message is already shown inside initFoldingViewer
+         return; // Abort if initialization failed
     }
-    console.log("[ViewSwitch] Step 2 Complete."); // LOG
+    console.log("[ViewSwitch] Step 2 Complete.");
     console.log("[DEBUG] Folding viewer initialized.");
 
-    // 3. Load the generated data into the folding viewer logic
+
+    // --- 3. Load the generated topological data into the folding viewer logic ---
     console.log("[DEBUG] Loading net data into folding viewer...");
-    console.log("[ViewSwitch] Step 3: Loading net data into folding viewer..."); // LOG
+    console.log("[ViewSwitch] Step 3: Loading net data into folding viewer...");
+    // This function creates the 3D geometry and sets up the folding state based on the topological data
     if (!loadNetForFolding(topologicalData)) {
-        /*...*/ return;
+         console.error("[ViewSwitch] Step 3 Failed: Loading net data for folding failed. Aborting switch.");
+         // Error message is already shown inside loadNetForFolding
+         return; // Abort if loading net data failed
     }
-    console.log("[ViewSwitch] Step 3 Complete."); // LOG
+    console.log("[ViewSwitch] Step 3 Complete.");
     console.log("[DEBUG] Net data loaded for folding.");
 
-    // 4. Switch visibility
-    console.log("[DEBUG] Switching visibility: Hiding 2D, Showing 3D...");
-    console.log("[ViewSwitch] Step 4: Switching DOM visibility..."); // LOG
-    canvas.style.display = "none";
-    threeContainer.style.display = "block"; // Show the 3D container
-    console.log("[ViewSwitch] Step 4 Complete."); // LOG
 
-    // Show and enable controls using class and disabled property
+    // --- 4. Switch DOM visibility ---
+    console.log("[DEBUG] Switching visibility: Hiding 2D, Showing 3D...");
+    console.log("[ViewSwitch] Step 4: Switching DOM visibility...");
+
+    // Hide the 2D canvas
+    canvas.style.display = "none";
+    // Show the 3D container
+    threeContainer.style.display = "block";
+
+    // Show and enable folding controls. Use the CSS 'hidden' class.
     if (foldingState.foldingControlsDiv) {
-        foldingState.foldingControlsDiv.classList.remove("hidden"); // Make container visible
+        foldingState.foldingControlsDiv.classList.remove("hidden"); // Remove hidden class to make it visible
         console.log("[DEBUG] Removed 'hidden' class from foldingControlsDiv.");
     } else {
-        console.error("Cannot show foldingControlsDiv - element not found.");
+        console.error("[ViewSwitch] Cannot show foldingControlsDiv - element not found.");
     }
-    if (foldingState.foldButton) foldingState.foldButton.disabled = false; // Enable fold button
-    // Pause button state managed by animation logic
+    // Enable the fold button (it was disabled when returning to 2D)
+    if (foldingState.foldButton) foldingState.foldButton.disabled = false;
+    // Pause button state is managed by the animation logic
 
+    // Swap visibility of the view switching buttons
     backTo2DButton.style.display = "block";
     switchTo3DButton.style.display = "none";
-    console.log("[DEBUG] Visibility switched.");
 
-    // 5. Resize and start animation loop
+    console.log("[DEBUG] Visibility switched.");
+    console.log("[ViewSwitch] Step 4 Complete.");
+
+
+    // --- 5. Resize 3D view and start the animation loop ---
+    // Use a small timeout (e.g., 10ms) to give the browser time to update DOM visibility
+    // before attempting to get the container size for resizing and starting the animation loop.
     setTimeout(() => {
         console.log("[ViewSwitch] setTimeout callback executing...");
         console.log(
             "[DEBUG] Executing setTimeout for resize/animation start...",
         );
         try {
+            // Ensure 3D viewer is still initialized before proceeding
             if (foldingState.threeInitialized) {
                 console.log(
                     "[ViewSwitch] setTimeout: Calling onThreeResize()...",
-                ); // LOG
-                onThreeResize(); // Resize the 3D folding view canvas
+                );
+                onThreeResize(); // Resize the 3D folding view canvas and renderer to fit the container
+
+                // Start the animation loop if it's not already running.
+                // animateFolding() includes the requestAnimationFrame call for the next frame.
                 if (foldingState.animationFrameId === null) {
                     console.log(
-                        "[ViewSwitch] setTimeout: Starting animateFolding()...",
-                    ); // LOG
-                    console.log("[DEBUG] Starting folding animation loop...");
-                    animateFolding();
-                } else {
-                    console.log(
-                        "[ViewSwitch] setTimeout: animateFolding() loop already running?",
-                    ); // LOG
-                    console.log(
-                        "[DEBUG] Folding animation loop already running?",
+                        "[ViewSwitch] setTimeout: Starting animateFolding() loop...",
                     );
+                    console.log("[DEBUG] Starting folding animation loop...");
+                    animateFolding(); // Start the animation loop
+                } else {
+                     // If animationFrameId is not null, the loop is already running.
+                     // This might happen if switching views quickly.
+                     // Just log a message and let the existing loop continue.
+                     console.log("[ViewSwitch] setTimeout: animateFolding() loop already running.");
                 }
-                console.log("[ViewSwitch] setTimeout callback complete."); // LOG
+                console.log("[ViewSwitch] setTimeout callback complete.");
                 console.log(
                     "[DEBUG] Switched to Folding 3D View (setTimeout complete).",
                 );
             } else {
-                console.error("[DEBUG] Folding view not ready in setTimeout.");
-                show2DView(false);
+                console.error("[DEBUG] Folding view not ready in setTimeout. Aborting switch.");
+                // If initialization somehow failed within the timeout, switch back to 2D
+                show2DView(false); // Pass false to avoid immediate redraw before potential error display
             }
         } catch (e) {
             console.error("[DEBUG] Error during 3D view switch timeout:", e);
             alert("Error switching view.");
+            // Switch back to 2D on error during the timeout processing
             show2DView(false);
         }
-    }, 0);
+    }, 10); // Small delay in milliseconds
+
+
     console.log(
         "[ViewSwitch] Exiting switchToFoldingView (setTimeout scheduled).",
-    ); // LOG
+    ); // Function exits after scheduling the timeout
 }
 
+
+// --- Switches the display back from the 3D folding viewer to the 2D editor ---
 export function show2DView(doRedraw = true) {
     console.log("[ViewSwitch] Entering show2DView...");
     console.log("Switching back to 2D Editor view...");
+
+    // Check if essential DOM elements are available
     if (!canvas || !threeContainer || !backTo2DButton || !switchTo3DButton) {
-        /*...*/ return;
+        console.error("[ViewSwitch] Missing essential DOM elements for view switching. Aborting switch back.");
+        alert("Application error: Cannot find view elements.");
+        return; // Abort if elements are missing
     }
 
-    console.log("[ViewSwitch] Stopping folding animation..."); // LOG
-    // Stop the folding animation loop
-    stopFoldingAnimation();
 
-    console.log("[ViewSwitch] Switching DOM visibility for 2D..."); // LOG
-    // Switch visibility
-    threeContainer.style.display = "none"; // Hide 3D container
+    // --- Stop 3D animation and clear 3D geometry ---
+    console.log("[ViewSwitch] Stopping folding animation...");
+    stopFoldingAnimation(); // Stop the animation loop
+
+
+    console.log("[ViewSwitch] Cleared folding scene geometry.");
+
+
+    // --- Switch DOM visibility ---
+    console.log("[ViewSwitch] Switching DOM visibility for 2D...");
+
+    // Hide the 3D container
+    threeContainer.style.display = "none";
+    // Hide the folding controls using the CSS 'hidden' class
     if (foldingState.foldingControlsDiv) {
-        foldingState.foldingControlsDiv.classList.add("hidden"); // Hide controls via class
+        foldingState.foldingControlsDiv.classList.add("hidden");
     }
-    // Disable folding controls when returning to 2D
+    // Disable folding controls buttons
     if (foldingState.foldButton) foldingState.foldButton.disabled = true;
     if (foldingState.pauseButton) foldingState.pauseButton.disabled = true;
 
-    canvas.style.display = "block"; // Show 2D canvas
+
+    // Show the 2D canvas
+    canvas.style.display = "block";
+
+    // Swap visibility of the view switching buttons
     backTo2DButton.style.display = "none";
     switchTo3DButton.style.display = "block";
 
-    // Resize and redraw the 2D canvas if requested
-    if (doRedraw) {
-        console.log("[ViewSwitch] Resizing/Redrawing 2D canvas..."); // LOG
-        resizeCanvas();
-    }
+    // Hide the color context menu if it's visible
+    hideColorContextMenu();
+
+
+    console.log("[DEBUG] Visibility switched back to 2D.");
+
+    // --- Resize and redraw the 2D canvas ---
+    // Always call resizeCanvas when switching to 2D to ensure the canvas dimensions are correct.
+    // resizeCanvas will call drawNet() internally.
+    console.log("[ViewSwitch] Resizing/Redrawing 2D canvas via resizeCanvas()...");
+    resizeCanvas(); // This function handles the 2D canvas resize and calls drawNet internally
+
     console.log("Switched to 2D Editor view.");
-    console.log("[ViewSwitch] Exiting show2DView."); // LOG
+    console.log("[ViewSwitch] Exiting show2DView.");
 }
 
 // --- Handle Resize for 3D View ---
-// --- Handle Resize for 3D View (Targets #threeCanvas now) ---
+// This function is called by the ResizeObserver and resizeCanvas when the window/container resizes.
+// It updates the 3D renderer and camera to match the new size.
 function onThreeResize() {
-    const canvas3D = document.getElementById("threeCanvas"); // Get the 3D canvas
+    // Get the dedicated 3D canvas element
+    const canvas3D = document.getElementById("threeCanvas");
+
+    // Check if essential elements and state are ready, and if the 3D container is currently visible.
     if (
         !foldingState.renderer ||
         !foldingState.camera ||
         !threeContainer ||
         !canvas3D ||
         !foldingState.threeInitialized ||
-        threeContainer.style.display === "none"
+        threeContainer.style.display === "none" // Only resize the 3D view if its container is displayed
     ) {
-        return;
+         // console.log("[onThreeResize] Skipping 3D resize: Not visible, not initialized, or elements missing.");
+        return; // Abort if conditions are not met
     }
-    // Use container dimensions to set canvas size (important for layout)
+
+    // Get the current dimensions of the threeContainer div.
+    // The canvas inside it is set to 100% width/height via CSS.
     const width = threeContainer.clientWidth;
     const height = threeContainer.clientHeight;
 
+    // Only proceed if the dimensions are valid (greater than zero)
     if (width > 0 && height > 0) {
-        // Update camera aspect based on container dimensions
+        // Update the camera's aspect ratio based on the new container dimensions
         foldingState.camera.aspect = width / height;
+        // Update the camera's projection matrix to apply the new aspect ratio
         foldingState.camera.updateProjectionMatrix();
-        // Update renderer size AND canvas style size
+
+        // Update the size of the WebGLRenderer to match the new dimensions
         console.log(
             `[onThreeResize] Setting renderer size to: ${width} x ${height}`,
         );
         foldingState.renderer.setSize(width, height);
-        // canvas3D.style.width = `${width}px`; // Not usually needed if renderer handles size
-        // canvas3D.style.height = `${height}px`;
-        // console.log(`Resized 3D folding view to ${width}x${height}`);
+
+         // Optional: If you need to adjust the camera position/target after resize, call fitFoldingCameraToNet() here.
+         // This can be useful if drastic resizes cause the model to go out of view.
+         // fitFoldingCameraToNet();
     } else {
         console.warn(
-            "Attempted to resize 3D view container with zero dimensions.",
+            "[onThreeResize] Attempted to resize 3D view container with zero dimensions. Skipping resize.",
         );
     }
 }
+
 
 /////////////////////////
 // end of view switching section
 /////////////////////////
 
+
 /////////////////////////
 // start of main initialization section
 /////////////////////////
+
+// Combined resize handler for both 2D and 3D views.
+// Called when the window is resized or explicitly when switching views.
 export function resizeCanvas() {
-    // Combined resize handler
+    console.log("[resizeCanvas] called.");
+    // Check if the 3D container is currently visible
     if (threeContainer && threeContainer.style.display !== "none") {
+        // If 3D is visible, call the 3D resize handler
+        console.log("[resizeCanvas] Resizing 3D canvas.");
         onThreeResize();
-    } // Resize folding view if active
+    }
+    // Check if the 2D canvas is currently visible
     else if (canvas && canvas.style.display !== "none") {
-        // Resize 2D view if active
+        // If 2D is visible, resize the 2D canvas to fit its container (.view-area)
+        console.log("[resizeCanvas] Resizing 2D canvas.");
         const viewArea = document.querySelector(".view-area");
-        if (!viewArea) return;
-        const viewRect = viewArea.getBoundingClientRect();
+        if (!viewArea) {
+             console.error("[resizeCanvas] .view-area element not found for 2D resize.");
+             return; // Abort if container is missing
+        }
+        const viewRect = viewArea.getBoundingClientRect(); // Get the dimensions of the container
+
+        // Only resize if the dimensions are valid (greater than zero)
         if (viewRect.width > 0 && viewRect.height > 0) {
-            canvas.width = viewRect.width;
-            canvas.height = viewRect.height;
+            canvas.width = viewRect.width; // Set canvas width attribute
+            canvas.height = viewRect.height; // Set canvas height attribute
             console.log(
                 `Resized 2D canvas to ${canvas.width}x${canvas.height}`,
             );
-            drawNet();
+            drawNet(); // Redraw the 2D net after resizing the canvas
         } else {
-            console.warn("View area has zero dimensions during 2D resize.");
+            console.warn("[resizeCanvas] View area has zero dimensions during 2D resize. Skipping resize and redraw.");
+             // Optionally, set canvas dimensions to 0 if container is 0, or keep a default small size.
+             // Setting to 0 will prevent drawing errors but nothing will be visible.
+             // Keeping last valid size might show content if container briefly goes to 0.
+             // Let's keep the console warn for now.
         }
+    } else {
+         console.log("[resizeCanvas] Neither 2D canvas nor 3D container is visible. Skipping resize.");
     }
 }
 
-// --- Initialize Function ---
+
+// --- Application Initialization Function ---
+// Called once the DOM is fully loaded.
 function initialize() {
     try {
-        console.log("Initializing Net Builder / Folder...");
-        if (!ctx) {
-            throw new Error("Failed to get 2D canvas context.");
+        console.log("Initializing Net Builder / Folder (Version 1.3)..."); // Added version log
+
+	canvas = document.getElementById("netCanvas");
+	ctx = canvas ? canvas.getContext("2d") : null;
+	paletteDiv = document.getElementById("palette");
+	paletteControlsDiv = document.getElementById("palette-controls");
+	paletteButtonsDiv = document.getElementById("palette-buttons");
+	saveButton = document.getElementById("saveButton");
+	loadFileInput = document.getElementById("loadFileInput");
+	clearButton = document.getElementById("clearButton");
+	exportTopologicalButton = document.getElementById("exportTopologicalButton");
+	switchTo3DButton = document.getElementById("switchTo3DButton");
+	backTo2DButton = document.getElementById("backTo2DButton");
+	threeContainer = document.getElementById("threeContainer");
+	console.log("Looking for colorContextMenu:", document.getElementById("colorContextMenu"));
+        colorContextMenu = document.getElementById("colorContextMenu");
+        colorMenuList = document.getElementById("colorMenuList");
+	
+        // Check if essential context menu DOM elements were found and log warnings if not
+        if (!colorContextMenu) console.error("Initialization warning: #colorContextMenu div not found! Color context menu feature will not work.");
+        if (!colorMenuList) console.error("Initialization warning: #colorMenuList ul not found! Color context menu feature will not work.");
+        if (!paletteButtonsDiv) console.error("Initialization warning: #palette-buttons div not found!");
+	
+	
+        // Add the contextmenu listener ONLY after elements are found
+        if (colorContextMenu && canvas) {
+            canvas.addEventListener("contextmenu", handleContextMenu);
+            console.log("Context menu listener added.");
+	    
+        } else if (canvas) {
+            console.warn("Context menu element not found, right-click color feature disabled.");
         }
-        // Create 2D UI
+
         if (paletteButtonsDiv) createPaletteButtons();
         else console.error("#palette-buttons div not found!");
-        if (colorSelectorsDiv) createColorPickers();
-        else console.error("#color-selectors div not found!");
-        // Setup listeners (finds elements, sets initial UI state for folding controls)
+
+        // Setup all other event listeners (for 2D interaction, view switching, keyboard, window resize, folding controls)
+        // This function also finds and stores references to folding control DOM elements and sets their initial state.
+        // NOTE: We moved the contextmenu listener setup out of here into the timeout above.
         setupEventListeners();
-        // Initialize 3D environment objects (doesn't touch controls DOM here)
+
+        // Initialize the 3D environment objects (scene, camera, renderer, controls).
+        // This prepares the 3D viewer even if it's not immediately visible.
         initFoldingViewer();
-        // Set initial view to 2D
-        show2DView(false);
-        // Perform initial resize for the 2D canvas
-        resizeCanvas();
-        console.log("Net Builder / Folder Initialized");
+
+        // --- Initial View Setup and Canvas Resize ---
+        // Set the initial view to 2D. This involves setting display styles for containers and buttons.
+        // Do NOT call show2DView(false) here, as it calls resizeCanvas/drawNet inside, which we handle explicitly next.
+        console.log("[Initialize] Setting initial view to 2D.");
+        if (canvas) canvas.style.display = "block";
+        if (threeContainer) threeContainer.style.display = "none";
+        if (backTo2DButton) backTo2DButton.style.display = "none";
+        if (switchTo3DButton) switchTo3DButton.style.display = "block";
+        if (foldingState.foldingControlsDiv) foldingState.foldingControlsDiv.classList.add("hidden");
+
+
+        // Perform the initial resize of the canvas. This is CRUCIAL to set the canvas's width/height attributes
+        // based on its container's size BEFORE the first draw call happens.
+        // resizeCanvas() also calls drawNet() internally, which will draw any initial polygons (though the net starts empty).
+        console.log("[Initialize] Performing initial canvas resize and draw via resizeCanvas().");
+        resizeCanvas(); // This will set canvas dimensions and call drawNet()
+
+        console.log("Net Builder / Folder Initialized successfully.");
+
     } catch (error) {
+        // Catch any errors during the initialization process and log/alert them.
         console.error("Initialization failed:", error);
         alert(`Application initialization failed: ${error.message}`);
     }
 }
 
-document.addEventListener("DOMContentLoaded", initialize);
+// Add an event listener to call the initialize function once the DOM is fully loaded.
+// This ensures all HTML elements are available before the script tries to access them.
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initialize);
+} else {
+  initialize();
+}
 /////////////////////////
 // end of main initialization section
 /////////////////////////
+
+
+// Call initialize after DOM is ready
+if (document.readyState === "loading") {
+  document.addEventListener("DOMContentLoaded", initialize);
+} else {
+  initialize();
+}
