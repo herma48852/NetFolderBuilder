@@ -1,0 +1,1851 @@
+{
+  "version": 1,
+  "polygons": [
+    {
+      "id": 0,
+      "sides": 5,
+      "centerPosition": {
+        "x": 352,
+        "y": 424.5625
+      },
+      "rotationAngle": 0,
+      "color": "#FDFFB6",
+      "connections": {
+        "0": {
+          "polyId": 1,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 5,
+          "edgeIndex": 2
+        },
+        "2": {
+          "polyId": 4,
+          "edgeIndex": 2
+        },
+        "3": {
+          "polyId": 3,
+          "edgeIndex": 0
+        },
+        "4": {
+          "polyId": 2,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 1,
+      "sides": 3,
+      "centerPosition": {
+        "x": 352,
+        "y": 375.71919525848
+      },
+      "rotationAngle": 5.235987755982988,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 6,
+          "edgeIndex": 1
+        },
+        "1": {
+          "polyId": 7,
+          "edgeIndex": 2
+        },
+        "2": {
+          "polyId": 0,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 2,
+      "sides": 3,
+      "centerPosition": {
+        "x": 305.54725674818746,
+        "y": 409.46908877343594
+      },
+      "rotationAngle": 6.0737457969402655,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 14,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 0,
+          "edgeIndex": 4
+        },
+        "2": {
+          "polyId": 15,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 3,
+      "sides": 3,
+      "centerPosition": {
+        "x": 323.2906257997075,
+        "y": 464.0775635973241
+      },
+      "rotationAngle": 0.6283185307179584,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 0,
+          "edgeIndex": 3
+        },
+        "1": {
+          "polyId": 24,
+          "edgeIndex": 0
+        },
+        "2": {
+          "polyId": 22,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 4,
+      "sides": 3,
+      "centerPosition": {
+        "x": 380.7093742002925,
+        "y": 464.0775635973241
+      },
+      "rotationAngle": 1.4660765716752373,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 23,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 25,
+          "edgeIndex": 0
+        },
+        "2": {
+          "polyId": 0,
+          "edgeIndex": 2
+        }
+      }
+    },
+    {
+      "id": 5,
+      "sides": 3,
+      "centerPosition": {
+        "x": 398.45274325181254,
+        "y": 409.46908877343594
+      },
+      "rotationAngle": 0.20943951023931914,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 38,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 39,
+          "edgeIndex": 0
+        },
+        "2": {
+          "polyId": 0,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 6,
+      "sides": 3,
+      "centerPosition": {
+        "x": 327,
+        "y": 361.2854385287393
+      },
+      "rotationAngle": 0,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 8,
+          "edgeIndex": 3
+        },
+        "1": {
+          "polyId": 1,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 7,
+      "sides": 3,
+      "centerPosition": {
+        "x": 377,
+        "y": 361.2854385287393
+      },
+      "rotationAngle": 8.881784197001252e-16,
+      "color": "#FFADAD",
+      "connections": {
+        "2": {
+          "polyId": 1,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 8,
+      "sides": 5,
+      "centerPosition": {
+        "x": 327,
+        "y": 312.4421337872193
+      },
+      "rotationAngle": 5.654866776461628,
+      "color": "#FDFFB6",
+      "connections": {
+        "0": {
+          "polyId": 13,
+          "edgeIndex": 1
+        },
+        "1": {
+          "polyId": 12,
+          "edgeIndex": 2
+        },
+        "2": {
+          "polyId": 9,
+          "edgeIndex": 0
+        },
+        "3": {
+          "polyId": 6,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 9,
+      "sides": 3,
+      "centerPosition": {
+        "x": 373.45274325181254,
+        "y": 327.53554501378335
+      },
+      "rotationAngle": 5.026548245743668,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 8,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 10,
+          "edgeIndex": 2
+        }
+      }
+    },
+    {
+      "id": 10,
+      "sides": 3,
+      "centerPosition": {
+        "x": 394.90548650362507,
+        "y": 308.21940822856817
+      },
+      "rotationAngle": 6.073745796940266,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 11,
+          "edgeIndex": 2
+        },
+        "2": {
+          "polyId": 9,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 11,
+      "sides": 3,
+      "centerPosition": {
+        "x": 388.9035929705599,
+        "y": 279.98271919902567
+      },
+      "rotationAngle": 5.026548245743669,
+      "color": "#FFADAD",
+      "connections": {
+        "2": {
+          "polyId": 10,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 12,
+      "sides": 3,
+      "centerPosition": {
+        "x": 355.7093742002925,
+        "y": 272.9270701898952
+      },
+      "rotationAngle": 5.864306286700947,
+      "color": "#FFADAD",
+      "connections": {
+        "2": {
+          "polyId": 8,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 13,
+      "sides": 3,
+      "centerPosition": {
+        "x": 298.2906257997075,
+        "y": 272.9270701898952
+      },
+      "rotationAngle": 0.4188790204786393,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 8,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 14,
+      "sides": 3,
+      "centerPosition": {
+        "x": 299.5453632151223,
+        "y": 381.23239974389344
+      },
+      "rotationAngle": 5.026548245743667,
+      "color": "#FFADAD",
+      "connections": {
+        "2": {
+          "polyId": 2,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 15,
+      "sides": 3,
+      "centerPosition": {
+        "x": 284.09451349637493,
+        "y": 428.7852255586512
+      },
+      "rotationAngle": 5.026548245743667,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 16,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 2,
+          "edgeIndex": 2
+        }
+      }
+    },
+    {
+      "id": 16,
+      "sides": 5,
+      "centerPosition": {
+        "x": 237.6417702445624,
+        "y": 413.6918143320871
+      },
+      "rotationAngle": 5.654866776461627,
+      "color": "#FDFFB6",
+      "connections": {
+        "0": {
+          "polyId": 20,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 17,
+          "edgeIndex": 2
+        },
+        "2": {
+          "polyId": 15,
+          "edgeIndex": 0
+        },
+        "4": {
+          "polyId": 21,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 17,
+      "sides": 3,
+      "centerPosition": {
+        "x": 266.3511444448548,
+        "y": 374.176750734763
+      },
+      "rotationAngle": 5.864306286700945,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 18,
+          "edgeIndex": 2
+        },
+        "2": {
+          "polyId": 16,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 18,
+      "sides": 3,
+      "centerPosition": {
+        "x": 254.60966892639988,
+        "y": 347.80496494041734
+      },
+      "rotationAngle": 4.817108735504347,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 19,
+          "edgeIndex": 1
+        },
+        "2": {
+          "polyId": 17,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 19,
+      "sides": 3,
+      "centerPosition": {
+        "x": 225.9002947261074,
+        "y": 344.7874881201395
+      },
+      "rotationAngle": 5.864306286700945,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 18,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 20,
+      "sides": 3,
+      "centerPosition": {
+        "x": 208.93239604426986,
+        "y": 374.17675073476306
+      },
+      "rotationAngle": 4.6076692252650275,
+      "color": "#FFADAD",
+      "connections": {
+        "2": {
+          "polyId": 16,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 21,
+      "sides": 3,
+      "centerPosition": {
+        "x": 191.18902699274986,
+        "y": 428.7852255586513
+      },
+      "rotationAngle": 5.445427266222307,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 16,
+          "edgeIndex": 4
+        }
+      }
+    },
+    {
+      "id": 22,
+      "sides": 3,
+      "centerPosition": {
+        "x": 294.58125159941505,
+        "y": 461.06008677704625
+      },
+      "rotationAngle": 5.8643062867009474,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 3,
+          "edgeIndex": 2
+        }
+      }
+    },
+    {
+      "id": 23,
+      "sides": 3,
+      "centerPosition": {
+        "x": 409.41874840058495,
+        "y": 461.0600867770463
+      },
+      "rotationAngle": 0.4188790204786402,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 32,
+          "edgeIndex": 4
+        },
+        "2": {
+          "polyId": 4,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 24,
+      "sides": 3,
+      "centerPosition": {
+        "x": 335.03210131816246,
+        "y": 490.4493493916699
+      },
+      "rotationAngle": 5.864306286700946,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 3,
+          "edgeIndex": 1
+        },
+        "2": {
+          "polyId": 26,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 25,
+      "sides": 3,
+      "centerPosition": {
+        "x": 368.9678986818375,
+        "y": 490.4493493916699
+      },
+      "rotationAngle": 0.4188790204786402,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 4,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 26,
+      "sides": 5,
+      "centerPosition": {
+        "x": 306.3227271178701,
+        "y": 529.964412988994
+      },
+      "rotationAngle": 5.654866776461626,
+      "color": "#FDFFB6",
+      "connections": {
+        "0": {
+          "polyId": 27,
+          "edgeIndex": 1
+        },
+        "1": {
+          "polyId": 24,
+          "edgeIndex": 2
+        },
+        "3": {
+          "polyId": 31,
+          "edgeIndex": 0
+        },
+        "4": {
+          "polyId": 30,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 27,
+      "sides": 3,
+      "centerPosition": {
+        "x": 277.6133529175776,
+        "y": 490.44934939167
+      },
+      "rotationAngle": 0.4188790204786366,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 26,
+          "edgeIndex": 0
+        },
+        "2": {
+          "polyId": 28,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 28,
+      "sides": 3,
+      "centerPosition": {
+        "x": 248.90397871728516,
+        "y": 493.46682621194793
+      },
+      "rotationAngle": 5.654866776461626,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 27,
+          "edgeIndex": 2
+        },
+        "2": {
+          "polyId": 29,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 29,
+      "sides": 3,
+      "centerPosition": {
+        "x": 237.16250319883028,
+        "y": 519.8386120062937
+      },
+      "rotationAngle": 0.4188790204786375,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 28,
+          "edgeIndex": 2
+        }
+      }
+    },
+    {
+      "id": 30,
+      "sides": 3,
+      "centerPosition": {
+        "x": 259.86998386605757,
+        "y": 545.0578242155583
+      },
+      "rotationAngle": 1.2566370614359152,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 26,
+          "edgeIndex": 4
+        }
+      }
+    },
+    {
+      "id": 31,
+      "sides": 3,
+      "centerPosition": {
+        "x": 306.3227271178702,
+        "y": 578.8077177305139
+      },
+      "rotationAngle": 6.283185307179582,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 26,
+          "edgeIndex": 3
+        }
+      }
+    },
+    {
+      "id": 32,
+      "sides": 5,
+      "centerPosition": {
+        "x": 438.1281226008774,
+        "y": 500.5751503743704
+      },
+      "rotationAngle": 0.6283185307179593,
+      "color": "#FDFFB6",
+      "connections": {
+        "1": {
+          "polyId": 37,
+          "edgeIndex": 2
+        },
+        "2": {
+          "polyId": 36,
+          "edgeIndex": 0
+        },
+        "3": {
+          "polyId": 33,
+          "edgeIndex": 1
+        },
+        "4": {
+          "polyId": 23,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 33,
+      "sides": 3,
+      "centerPosition": {
+        "x": 391.6753793490649,
+        "y": 515.6685616009345
+      },
+      "rotationAngle": 5.445427266222309,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 32,
+          "edgeIndex": 3
+        },
+        "2": {
+          "polyId": 34,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 34,
+      "sides": 3,
+      "centerPosition": {
+        "x": 385.6734858159997,
+        "y": 543.905250630477
+      },
+      "rotationAngle": 0.20943951023931745,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 33,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 35,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 35,
+      "sides": 3,
+      "centerPosition": {
+        "x": 407.12622906781223,
+        "y": 563.2213874156923
+      },
+      "rotationAngle": 5.445427266222307,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 34,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 36,
+      "sides": 3,
+      "centerPosition": {
+        "x": 438.1281226008774,
+        "y": 549.4184551158905
+      },
+      "rotationAngle": 0,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 32,
+          "edgeIndex": 2
+        }
+      }
+    },
+    {
+      "id": 37,
+      "sides": 3,
+      "centerPosition": {
+        "x": 484.58086585268995,
+        "y": 515.6685616009345
+      },
+      "rotationAngle": 0.8377580409572777,
+      "color": "#FFADAD",
+      "connections": {
+        "2": {
+          "polyId": 32,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 38,
+      "sides": 3,
+      "centerPosition": {
+        "x": 404.4546367848777,
+        "y": 381.23239974389344
+      },
+      "rotationAngle": 5.445427266222309,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 40,
+          "edgeIndex": 4
+        },
+        "2": {
+          "polyId": 5,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 39,
+      "sides": 3,
+      "centerPosition": {
+        "x": 419.90548650362507,
+        "y": 428.78522555865106
+      },
+      "rotationAngle": 5.445427266222307,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 5,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 40,
+      "sides": 5,
+      "centerPosition": {
+        "x": 450.90738003669026,
+        "y": 366.1389885173294
+      },
+      "rotationAngle": 5.654866776461628,
+      "color": "#FDFFB6",
+      "connections": {
+        "1": {
+          "polyId": 41,
+          "edgeIndex": 2
+        },
+        "2": {
+          "polyId": 44,
+          "edgeIndex": 0
+        },
+        "3": {
+          "polyId": 42,
+          "edgeIndex": 0
+        },
+        "4": {
+          "polyId": 38,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 41,
+      "sides": 3,
+      "centerPosition": {
+        "x": 479.61675423698273,
+        "y": 326.62392492000527
+      },
+      "rotationAngle": 5.864306286700947,
+      "color": "#FFADAD",
+      "connections": {
+        "2": {
+          "polyId": 40,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 42,
+      "sides": 3,
+      "centerPosition": {
+        "x": 450.90738003669026,
+        "y": 414.9822932588494
+      },
+      "rotationAngle": 0,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 40,
+          "edgeIndex": 3
+        },
+        "1": {
+          "polyId": 43,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 43,
+      "sides": 3,
+      "centerPosition": {
+        "x": 475.90738003669026,
+        "y": 429.4160499885901
+      },
+      "rotationAngle": 5.235987755982989,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 42,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 44,
+      "sides": 3,
+      "centerPosition": {
+        "x": 497.3601232885028,
+        "y": 381.23239974389344
+      },
+      "rotationAngle": 5.026548245743668,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 40,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 46,
+          "edgeIndex": 2
+        },
+        "2": {
+          "polyId": 45,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 45,
+      "sides": 3,
+      "centerPosition": {
+        "x": 503.362016821568,
+        "y": 409.46908877343594
+      },
+      "rotationAngle": 6.0737457969402655,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 44,
+          "edgeIndex": 2
+        }
+      }
+    },
+    {
+      "id": 46,
+      "sides": 3,
+      "centerPosition": {
+        "x": 518.8128665403153,
+        "y": 361.9162629586782
+      },
+      "rotationAngle": 6.0737457969402655,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 47,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 48,
+          "edgeIndex": 4
+        },
+        "2": {
+          "polyId": 44,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 47,
+      "sides": 3,
+      "centerPosition": {
+        "x": 512.8109730072501,
+        "y": 333.6795739291357
+      },
+      "rotationAngle": 5.026548245743667,
+      "color": "#FFADAD",
+      "connections": {
+        "2": {
+          "polyId": 46,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 48,
+      "sides": 5,
+      "centerPosition": {
+        "x": 565.2656097921279,
+        "y": 377.00967418524226
+      },
+      "rotationAngle": 0,
+      "color": "#FDFFB6",
+      "connections": {
+        "0": {
+          "polyId": 50,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 52,
+          "edgeIndex": 2
+        },
+        "3": {
+          "polyId": 49,
+          "edgeIndex": 1
+        },
+        "4": {
+          "polyId": 46,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 49,
+      "sides": 3,
+      "centerPosition": {
+        "x": 536.5562355918354,
+        "y": 416.5247377825664
+      },
+      "rotationAngle": 4.81710873550435,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 48,
+          "edgeIndex": 3
+        }
+      }
+    },
+    {
+      "id": 50,
+      "sides": 3,
+      "centerPosition": {
+        "x": 565.2656097921279,
+        "y": 328.16636944372226
+      },
+      "rotationAngle": 5.235987755982989,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 51,
+          "edgeIndex": 1
+        },
+        "2": {
+          "polyId": 48,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 51,
+      "sides": 3,
+      "centerPosition": {
+        "x": 540.2656097921279,
+        "y": 313.73261271398155
+      },
+      "rotationAngle": 0,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 50,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 52,
+      "sides": 3,
+      "centerPosition": {
+        "x": 611.7183530439404,
+        "y": 361.9162629586781
+      },
+      "rotationAngle": 0.20943951023931826,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 53,
+          "edgeIndex": 1
+        },
+        "2": {
+          "polyId": 48,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 53,
+      "sides": 3,
+      "centerPosition": {
+        "x": 617.7202465770056,
+        "y": 333.6795739291356
+      },
+      "rotationAngle": 1.2566370614359166,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 55,
+          "edgeIndex": 3
+        },
+        "1": {
+          "polyId": 52,
+          "edgeIndex": 0
+        },
+        "2": {
+          "polyId": 54,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 54,
+      "sides": 3,
+      "centerPosition": {
+        "x": 596.267503325193,
+        "y": 314.3634371439204
+      },
+      "rotationAngle": 0.20943951023932011,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 53,
+          "edgeIndex": 2
+        }
+      }
+    },
+    {
+      "id": 55,
+      "sides": 5,
+      "centerPosition": {
+        "x": 664.1729898288181,
+        "y": 318.58616270257147
+      },
+      "rotationAngle": 0.6283185307179602,
+      "color": "#FDFFB6",
+      "connections": {
+        "0": {
+          "polyId": 65,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 74,
+          "edgeIndex": 2
+        },
+        "2": {
+          "polyId": 83,
+          "edgeIndex": 0
+        },
+        "3": {
+          "polyId": 53,
+          "edgeIndex": 0
+        },
+        "4": {
+          "polyId": 56,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 56,
+      "sides": 3,
+      "centerPosition": {
+        "x": 635.4636156285258,
+        "y": 279.0710991052473
+      },
+      "rotationAngle": 0.41887902047864095,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 58,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 55,
+          "edgeIndex": 4
+        },
+        "2": {
+          "polyId": 57,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 57,
+      "sides": 3,
+      "centerPosition": {
+        "x": 606.7542414282332,
+        "y": 282.0885759255251
+      },
+      "rotationAngle": 1.4660765716752409,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 56,
+          "edgeIndex": 2
+        },
+        "2": {
+          "polyId": 59,
+          "edgeIndex": 2
+        }
+      }
+    },
+    {
+      "id": 58,
+      "sides": 3,
+      "centerPosition": {
+        "x": 647.2050911469807,
+        "y": 252.69931331090163
+      },
+      "rotationAngle": 5.654866776461631,
+      "color": "#FFADAD",
+      "connections": {
+        "2": {
+          "polyId": 56,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 59,
+      "sides": 5,
+      "centerPosition": {
+        "x": 578.0448672279408,
+        "y": 242.57351232820088
+      },
+      "rotationAngle": 3.9968028886505635e-15,
+      "color": "#FDFFB6",
+      "connections": {
+        "0": {
+          "polyId": 61,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 62,
+          "edgeIndex": 2
+        },
+        "2": {
+          "polyId": 57,
+          "edgeIndex": 2
+        },
+        "4": {
+          "polyId": 60,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 60,
+      "sides": 3,
+      "centerPosition": {
+        "x": 531.5921239761283,
+        "y": 227.48010110163656
+      },
+      "rotationAngle": 6.073745796940273,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 59,
+          "edgeIndex": 4
+        }
+      }
+    },
+    {
+      "id": 61,
+      "sides": 3,
+      "centerPosition": {
+        "x": 578.044867227941,
+        "y": 193.73020758668088
+      },
+      "rotationAngle": 5.235987755982993,
+      "color": "#FFADAD",
+      "connections": {
+        "2": {
+          "polyId": 59,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 62,
+      "sides": 3,
+      "centerPosition": {
+        "x": 624.4976104797536,
+        "y": 227.48010110163693
+      },
+      "rotationAngle": 0.20943951023932278,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 63,
+          "edgeIndex": 1
+        },
+        "2": {
+          "polyId": 59,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 63,
+      "sides": 3,
+      "centerPosition": {
+        "x": 630.4995040128188,
+        "y": 199.24341207209446
+      },
+      "rotationAngle": 1.2566370614359201,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 62,
+          "edgeIndex": 0
+        },
+        "2": {
+          "polyId": 64,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 64,
+      "sides": 3,
+      "centerPosition": {
+        "x": 609.0467607610062,
+        "y": 179.92727528687917
+      },
+      "rotationAngle": 0.20943951023932278,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 63,
+          "edgeIndex": 2
+        }
+      }
+    },
+    {
+      "id": 65,
+      "sides": 3,
+      "centerPosition": {
+        "x": 692.8823640291107,
+        "y": 279.0710991052474
+      },
+      "rotationAngle": 5.864306286700948,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 66,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 67,
+          "edgeIndex": 2
+        },
+        "2": {
+          "polyId": 55,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 66,
+      "sides": 3,
+      "centerPosition": {
+        "x": 681.1408885106557,
+        "y": 252.69931331090163
+      },
+      "rotationAngle": 4.81710873550435,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 68,
+          "edgeIndex": 3
+        },
+        "2": {
+          "polyId": 65,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 67,
+      "sides": 3,
+      "centerPosition": {
+        "x": 721.5917382294033,
+        "y": 282.0885759255253
+      },
+      "rotationAngle": 0.6283185307179584,
+      "color": "#FFADAD",
+      "connections": {
+        "2": {
+          "polyId": 65,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 68,
+      "sides": 5,
+      "centerPosition": {
+        "x": 709.8502627109482,
+        "y": 213.18424971357757
+      },
+      "rotationAngle": 8.881784197001252e-16,
+      "color": "#FDFFB6",
+      "connections": {
+        "0": {
+          "polyId": 69,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 70,
+          "edgeIndex": 2
+        },
+        "2": {
+          "polyId": 71,
+          "edgeIndex": 0
+        },
+        "3": {
+          "polyId": 66,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 69,
+      "sides": 3,
+      "centerPosition": {
+        "x": 709.8502627109482,
+        "y": 164.34094497205757
+      },
+      "rotationAngle": 5.23598775598299,
+      "color": "#FFADAD",
+      "connections": {
+        "2": {
+          "polyId": 68,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 70,
+      "sides": 3,
+      "centerPosition": {
+        "x": 756.3030059627607,
+        "y": 198.09083848701346
+      },
+      "rotationAngle": 0.20943951023931826,
+      "color": "#FFADAD",
+      "connections": {
+        "2": {
+          "polyId": 68,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 71,
+      "sides": 3,
+      "centerPosition": {
+        "x": 738.5596369112407,
+        "y": 252.6993133109017
+      },
+      "rotationAngle": 5.654866776461628,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 68,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 72,
+          "edgeIndex": 2
+        }
+      }
+    },
+    {
+      "id": 72,
+      "sides": 3,
+      "centerPosition": {
+        "x": 767.2690111115332,
+        "y": 249.6818364906238
+      },
+      "rotationAngle": 0.4188790204786383,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 73,
+          "edgeIndex": 1
+        },
+        "2": {
+          "polyId": 71,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 73,
+      "sides": 3,
+      "centerPosition": {
+        "x": 779.0104866299882,
+        "y": 223.310050696278
+      },
+      "rotationAngle": 1.4660765716752373,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 72,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 74,
+      "sides": 3,
+      "centerPosition": {
+        "x": 710.6257330806307,
+        "y": 333.6795739291356
+      },
+      "rotationAngle": 0.8377580409572785,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 75,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 76,
+          "edgeIndex": 0
+        },
+        "2": {
+          "polyId": 55,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 75,
+      "sides": 3,
+      "centerPosition": {
+        "x": 732.0784763324432,
+        "y": 314.36343714392046
+      },
+      "rotationAngle": 6.073745796940266,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 77,
+          "edgeIndex": 4
+        },
+        "2": {
+          "polyId": 74,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 76,
+      "sides": 3,
+      "centerPosition": {
+        "x": 716.6276266136958,
+        "y": 361.9162629586781
+      },
+      "rotationAngle": 6.073745796940267,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 74,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 77,
+      "sides": 5,
+      "centerPosition": {
+        "x": 778.5312195842557,
+        "y": 329.4568483704845
+      },
+      "rotationAngle": 0,
+      "color": "#FDFFB6",
+      "connections": {
+        "1": {
+          "polyId": 78,
+          "edgeIndex": 2
+        },
+        "2": {
+          "polyId": 79,
+          "edgeIndex": 0
+        },
+        "3": {
+          "polyId": 80,
+          "edgeIndex": 0
+        },
+        "4": {
+          "polyId": 75,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 78,
+      "sides": 3,
+      "centerPosition": {
+        "x": 824.9839628360683,
+        "y": 314.36343714392035
+      },
+      "rotationAngle": 0.20943951023931826,
+      "color": "#FFADAD",
+      "connections": {
+        "2": {
+          "polyId": 77,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 79,
+      "sides": 3,
+      "centerPosition": {
+        "x": 807.2405937845482,
+        "y": 368.97191196780864
+      },
+      "rotationAngle": 5.654866776461628,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 77,
+          "edgeIndex": 2
+        }
+      }
+    },
+    {
+      "id": 80,
+      "sides": 3,
+      "centerPosition": {
+        "x": 749.8218453839633,
+        "y": 368.97191196780864
+      },
+      "rotationAngle": 0.6283185307179584,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 77,
+          "edgeIndex": 3
+        },
+        "1": {
+          "polyId": 81,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 81,
+      "sides": 3,
+      "centerPosition": {
+        "x": 761.5633209024181,
+        "y": 395.3436977621544
+      },
+      "rotationAngle": 5.864306286700946,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 80,
+          "edgeIndex": 1
+        },
+        "1": {
+          "polyId": 82,
+          "edgeIndex": 2
+        }
+      }
+    },
+    {
+      "id": 82,
+      "sides": 3,
+      "centerPosition": {
+        "x": 790.2726951027107,
+        "y": 398.3611745824322
+      },
+      "rotationAngle": 0.6283185307179566,
+      "color": "#FFADAD",
+      "connections": {
+        "2": {
+          "polyId": 81,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 83,
+      "sides": 3,
+      "centerPosition": {
+        "x": 664.1729898288181,
+        "y": 367.4294674440914
+      },
+      "rotationAngle": 8.881784197001252e-16,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 55,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 85,
+          "edgeIndex": 2
+        },
+        "2": {
+          "polyId": 84,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 84,
+      "sides": 3,
+      "centerPosition": {
+        "x": 639.1729898288181,
+        "y": 381.8632241738321
+      },
+      "rotationAngle": 1.0471975511965976,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 83,
+          "edgeIndex": 2
+        }
+      }
+    },
+    {
+      "id": 85,
+      "sides": 3,
+      "centerPosition": {
+        "x": 689.1729898288181,
+        "y": 381.8632241738321
+      },
+      "rotationAngle": 1.0471975511965985,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 86,
+          "edgeIndex": 0
+        },
+        "2": {
+          "polyId": 83,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 86,
+      "sides": 5,
+      "centerPosition": {
+        "x": 689.1729898288181,
+        "y": 430.7065289153521
+      },
+      "rotationAngle": 0,
+      "color": "#FDFFB6",
+      "connections": {
+        "0": {
+          "polyId": 85,
+          "edgeIndex": 1
+        },
+        "2": {
+          "polyId": 91,
+          "edgeIndex": 0
+        },
+        "3": {
+          "polyId": 90,
+          "edgeIndex": 0
+        },
+        "4": {
+          "polyId": 87,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 87,
+      "sides": 3,
+      "centerPosition": {
+        "x": 642.7202465770056,
+        "y": 415.61311768878795
+      },
+      "rotationAngle": 6.073745796940268,
+      "color": "#FFADAD",
+      "connections": {
+        "1": {
+          "polyId": 86,
+          "edgeIndex": 4
+        },
+        "2": {
+          "polyId": 88,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 88,
+      "sides": 3,
+      "centerPosition": {
+        "x": 621.267503325193,
+        "y": 434.92925447400313
+      },
+      "rotationAngle": 0.8377580409572777,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 87,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 89,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 89,
+      "sides": 3,
+      "centerPosition": {
+        "x": 627.2693968582582,
+        "y": 463.1659435035456
+      },
+      "rotationAngle": 6.0737457969402655,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 88,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 90,
+      "sides": 3,
+      "centerPosition": {
+        "x": 660.4636156285256,
+        "y": 470.22159251267624
+      },
+      "rotationAngle": 0.6283185307179584,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 86,
+          "edgeIndex": 3
+        }
+      }
+    },
+    {
+      "id": 91,
+      "sides": 3,
+      "centerPosition": {
+        "x": 717.8823640291106,
+        "y": 470.22159251267624
+      },
+      "rotationAngle": 5.654866776461628,
+      "color": "#FFADAD",
+      "connections": {
+        "0": {
+          "polyId": 86,
+          "edgeIndex": 2
+        }
+      }
+    }
+  ],
+  "nextId": 92,
+  "viewOffset": {
+    "x": 0,
+    "y": 0
+  },
+  "polygonColors": {
+    "3": "#FFADAD",
+    "4": "#FFD6A5",
+    "5": "#FDFFB6",
+    "6": "#CAFFBF",
+    "7": "#9BF6FF",
+    "8": "#A0C4FF",
+    "10": "#BDB2FF"
+  }
+}

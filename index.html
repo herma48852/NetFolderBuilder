@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Net Builder & 3D Folder</title> <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>2D Net Builder & 3D Folder</h1> <div class="container">
+        <div id="palette">
+             <h2>Palette</h2>
+             <div id="palette-controls">
+                 <button id="saveButton">Save 2D Net</button>
+                 <label for="loadFileInput">Load 2D Net</label>
+                 <input type="file" id="loadFileInput" accept=".json,application/json">
+                 <button id="clearButton">Clear Net</button>
+                 <button id="exportTopologicalButton">Export Topological</button>
+                 <button id="switchTo3DButton">Fold Net in 3D</button>
+                 <button id="backTo2DButton" style="display: none;">Back to 2D Editor</button>
+            </div>
+             <div id="palette-buttons"></div>
+             <div id="color-selectors"></div>
+             <div id="instructions">
+                 <p>Click palette -> canvas to place.</p>
+                 <p>Click & Drag shape to move.</p>
+                 <p>Select shape, use 'R'/'L' keys to rotate.</p>
+                 <p>Hold SPACEBAR & Drag to Pan view.</p>
+                 <p>Edges glow magenta when near snap.</p>
+                 <p>(Del/Bksp to delete selected)</p>
+                 <p>Click 'Fold Net in 3D' to view.</p>
+             </div>
+        </div>
+        <div class="view-area">
+            <canvas id="netCanvas"></canvas>
+            <div id="threeContainer" style="display: none;">
+                 <canvas id="threeCanvas"></canvas>
+                 <div id="foldingControls"> <div id="foldingInfo">Loaded Net</div>
+                     <div>
+                         <button id="foldButton3D">Fold</button>
+                         <button id="pauseButton3D">Pause</button>
+                     </div>
+                     <div>
+                         <label for="speedSlider3D">Speed:</label>
+                         <input type="range" id="speedSlider3D" min="200" max="4000" value="500" step="100">
+                         <span id="speedValue3D">500 ms</span>
+                     </div>
+                     <div>
+                         <input type="checkbox" id="toggleNormals3D" name="toggleNormals3D">
+                         <label for="toggleNormals3D">Show Normals</label>
+                     </div>
+                 </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.163.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.163.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module" src="new-main.js"></script>
+</body>
+</html>

@@ -1,0 +1,131 @@
+{
+  "version": 1,
+  "polygons": [
+    {
+      "id": 0,
+      "sides": 4,
+      "centerPosition": {
+        "x": 279.03125,
+        "y": 378.5625
+      },
+      "rotationAngle": 0,
+      "color": "#FFD6A5",
+      "connections": {
+        "0": {
+          "polyId": 1,
+          "edgeIndex": 2
+        }
+      }
+    },
+    {
+      "id": 1,
+      "sides": 4,
+      "centerPosition": {
+        "x": 279.03125,
+        "y": 328.5625
+      },
+      "rotationAngle": 0,
+      "color": "#FFD6A5",
+      "connections": {
+        "0": {
+          "polyId": 2,
+          "edgeIndex": 2
+        },
+        "2": {
+          "polyId": 0,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 2,
+      "sides": 4,
+      "centerPosition": {
+        "x": 279.03125,
+        "y": 278.5625
+      },
+      "rotationAngle": 0,
+      "color": "#FFD6A5",
+      "connections": {
+        "0": {
+          "polyId": 3,
+          "edgeIndex": 2
+        },
+        "1": {
+          "polyId": 5,
+          "edgeIndex": 3
+        },
+        "2": {
+          "polyId": 1,
+          "edgeIndex": 0
+        },
+        "3": {
+          "polyId": 4,
+          "edgeIndex": 1
+        }
+      }
+    },
+    {
+      "id": 3,
+      "sides": 4,
+      "centerPosition": {
+        "x": 279.03125,
+        "y": 228.5625
+      },
+      "rotationAngle": 0,
+      "color": "#FFD6A5",
+      "connections": {
+        "2": {
+          "polyId": 2,
+          "edgeIndex": 0
+        }
+      }
+    },
+    {
+      "id": 4,
+      "sides": 4,
+      "centerPosition": {
+        "x": 229.03125,
+        "y": 278.5625
+      },
+      "rotationAngle": 0,
+      "color": "#FFD6A5",
+      "connections": {
+        "1": {
+          "polyId": 2,
+          "edgeIndex": 3
+        }
+      }
+    },
+    {
+      "id": 5,
+      "sides": 4,
+      "centerPosition": {
+        "x": 329.03125,
+        "y": 278.5625
+      },
+      "rotationAngle": 0,
+      "color": "#FFD6A5",
+      "connections": {
+        "3": {
+          "polyId": 2,
+          "edgeIndex": 1
+        }
+      }
+    }
+  ],
+  "nextId": 6,
+  "viewOffset": {
+    "x": 0,
+    "y": 0
+  },
+  "polygonColors": {
+    "3": "#FFADAD",
+    "4": "#FFD6A5",
+    "5": "#FDFFB6",
+    "6": "#CAFFBF",
+    "7": "#9BF6FF",
+    "8": "#A0C4FF",
+    "10": "#BDB2FF"
+  }
+}
