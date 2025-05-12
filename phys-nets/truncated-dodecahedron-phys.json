@@ -77,7 +77,7 @@
         "y": 237.4084409390889
       },
       "rotationAngle": 0,
-      "color": "#BDB2FF",
+      "color": "green",
       "connections": {
         "2": {
           "polyId": 3,
@@ -129,7 +129,7 @@
         "y": 343.739791983094
       },
       "rotationAngle": 6.283185307179585,
-      "color": "#BDB2FF",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 6,
@@ -181,7 +181,7 @@
         "y": 515.7875320419905
       },
       "rotationAngle": 0,
-      "color": "#BDB2FF",
+      "color": "red",
       "connections": {
         "1": {
           "polyId": 0,
@@ -233,7 +233,7 @@
         "y": 515.7875320419905
       },
       "rotationAngle": 5.6548667764616285,
-      "color": "#BDB2FF",
+      "color": "green",
       "connections": {
         "0": {
           "polyId": 0,
@@ -285,7 +285,7 @@
         "y": 343.73979198309394
       },
       "rotationAngle": 0,
-      "color": "#BDB2FF",
+      "color": "blue",
       "connections": {
         "3": {
           "polyId": 15,
@@ -305,7 +305,7 @@
         "y": 391.2926177978517
       },
       "rotationAngle": 1.7763568394002505e-15,
-      "color": "#BDB2FF",
+      "color": "yellow",
       "connections": {
         "2": {
           "polyId": 18,
@@ -433,7 +433,7 @@
         "y": 219.24487773895498
       },
       "rotationAngle": 3.1086244689504383e-15,
-      "color": "#BDB2FF",
+      "color": "red",
       "connections": {
         "1": {
           "polyId": 21,
@@ -485,7 +485,7 @@
         "y": 219.24487773895567
       },
       "rotationAngle": 2.6645352591003757e-15,
-      "color": "#BDB2FF",
+      "color": "orange",
       "connections": {
         "3": {
           "polyId": 24,
@@ -537,7 +537,7 @@
         "y": 391.2926177978524
       },
       "rotationAngle": 1.7763568394002505e-15,
-      "color": "#BDB2FF",
+      "color": "blue",
       "connections": {
         "5": {
           "polyId": 27,
@@ -573,7 +573,7 @@
         "y": 497.62396884185705
       },
       "rotationAngle": 3.1086244689504383e-15,
-      "color": "#BDB2FF",
+      "color": "orange",
       "connections": {
         "0": {
           "polyId": 18,

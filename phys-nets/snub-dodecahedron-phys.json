@@ -9,7 +9,7 @@
         "y": 424.5625
       },
       "rotationAngle": 0,
-      "color": "#FDFFB6",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 1,
@@ -41,7 +41,7 @@
         "y": 375.71919525848
       },
       "rotationAngle": 5.235987755982988,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 6,
@@ -65,7 +65,7 @@
         "y": 409.46908877343594
       },
       "rotationAngle": 6.0737457969402655,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 14,
@@ -89,7 +89,7 @@
         "y": 464.0775635973241
       },
       "rotationAngle": 0.6283185307179584,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 0,
@@ -137,7 +137,7 @@
         "y": 409.46908877343594
       },
       "rotationAngle": 0.20943951023931914,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 38,
@@ -181,7 +181,7 @@
         "y": 361.2854385287393
       },
       "rotationAngle": 8.881784197001252e-16,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "2": {
           "polyId": 1,
@@ -197,7 +197,7 @@
         "y": 312.4421337872193
       },
       "rotationAngle": 5.654866776461628,
-      "color": "#FDFFB6",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 13,
@@ -225,7 +225,7 @@
         "y": 327.53554501378335
       },
       "rotationAngle": 5.026548245743668,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 8,
@@ -265,7 +265,7 @@
         "y": 279.98271919902567
       },
       "rotationAngle": 5.026548245743669,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "2": {
           "polyId": 10,
@@ -281,7 +281,7 @@
         "y": 272.9270701898952
       },
       "rotationAngle": 5.864306286700947,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "2": {
           "polyId": 8,
@@ -297,7 +297,7 @@
         "y": 272.9270701898952
       },
       "rotationAngle": 0.4188790204786393,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "1": {
           "polyId": 8,
@@ -313,7 +313,7 @@
         "y": 381.23239974389344
       },
       "rotationAngle": 5.026548245743667,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "2": {
           "polyId": 2,
@@ -329,7 +329,7 @@
         "y": 428.7852255586512
       },
       "rotationAngle": 5.026548245743667,
-      "color": "#FFADAD",
+      "color": "pink",
       "connections": {
         "0": {
           "polyId": 16,
@@ -349,7 +349,7 @@
         "y": 413.6918143320871
       },
       "rotationAngle": 5.654866776461627,
-      "color": "#FDFFB6",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 20,
@@ -377,7 +377,7 @@
         "y": 374.176750734763
       },
       "rotationAngle": 5.864306286700945,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 18,
@@ -417,7 +417,7 @@
         "y": 344.7874881201395
       },
       "rotationAngle": 5.864306286700945,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "1": {
           "polyId": 18,
@@ -465,7 +465,7 @@
         "y": 461.06008677704625
       },
       "rotationAngle": 5.8643062867009474,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "1": {
           "polyId": 3,
@@ -481,7 +481,7 @@
         "y": 461.0600867770463
       },
       "rotationAngle": 0.4188790204786402,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "1": {
           "polyId": 32,
@@ -501,7 +501,7 @@
         "y": 490.4493493916699
       },
       "rotationAngle": 5.864306286700946,
-      "color": "#FFADAD",
+      "color": "pink",
       "connections": {
         "0": {
           "polyId": 3,
@@ -521,7 +521,7 @@
         "y": 490.4493493916699
       },
       "rotationAngle": 0.4188790204786402,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "0": {
           "polyId": 4,
@@ -537,7 +537,7 @@
         "y": 529.964412988994
       },
       "rotationAngle": 5.654866776461626,
-      "color": "#FDFFB6",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 27,
@@ -565,7 +565,7 @@
         "y": 490.44934939167
       },
       "rotationAngle": 0.4188790204786366,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "1": {
           "polyId": 26,
@@ -605,7 +605,7 @@
         "y": 519.8386120062937
       },
       "rotationAngle": 0.4188790204786375,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "0": {
           "polyId": 28,
@@ -637,7 +637,7 @@
         "y": 578.8077177305139
       },
       "rotationAngle": 6.283185307179582,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 26,
@@ -653,7 +653,7 @@
         "y": 500.5751503743704
       },
       "rotationAngle": 0.6283185307179593,
-      "color": "#FDFFB6",
+      "color": "red",
       "connections": {
         "1": {
           "polyId": 37,
@@ -681,7 +681,7 @@
         "y": 515.6685616009345
       },
       "rotationAngle": 5.445427266222309,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "1": {
           "polyId": 32,
@@ -721,7 +721,7 @@
         "y": 563.2213874156923
       },
       "rotationAngle": 5.445427266222307,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "0": {
           "polyId": 34,
@@ -737,7 +737,7 @@
         "y": 549.4184551158905
       },
       "rotationAngle": 0,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 32,
@@ -753,7 +753,7 @@
         "y": 515.6685616009345
       },
       "rotationAngle": 0.8377580409572777,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "2": {
           "polyId": 32,
@@ -789,7 +789,7 @@
         "y": 428.78522555865106
       },
       "rotationAngle": 5.445427266222307,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "0": {
           "polyId": 5,
@@ -805,7 +805,7 @@
         "y": 366.1389885173294
       },
       "rotationAngle": 5.654866776461628,
-      "color": "#FDFFB6",
+      "color": "red",
       "connections": {
         "1": {
           "polyId": 41,
@@ -849,7 +849,7 @@
         "y": 414.9822932588494
       },
       "rotationAngle": 0,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 40,
@@ -885,7 +885,7 @@
         "y": 381.23239974389344
       },
       "rotationAngle": 5.026548245743668,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 40,
@@ -909,7 +909,7 @@
         "y": 409.46908877343594
       },
       "rotationAngle": 6.0737457969402655,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "0": {
           "polyId": 44,
@@ -949,7 +949,7 @@
         "y": 333.6795739291357
       },
       "rotationAngle": 5.026548245743667,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "2": {
           "polyId": 46,
@@ -965,7 +965,7 @@
         "y": 377.00967418524226
       },
       "rotationAngle": 0,
-      "color": "#FDFFB6",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 50,
@@ -1009,7 +1009,7 @@
         "y": 328.16636944372226
       },
       "rotationAngle": 5.235987755982989,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 51,
@@ -1065,7 +1065,7 @@
         "y": 333.6795739291356
       },
       "rotationAngle": 1.2566370614359166,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 55,
@@ -1089,7 +1089,7 @@
         "y": 314.3634371439204
       },
       "rotationAngle": 0.20943951023932011,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "1": {
           "polyId": 53,
@@ -1105,7 +1105,7 @@
         "y": 318.58616270257147
       },
       "rotationAngle": 0.6283185307179602,
-      "color": "#FDFFB6",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 65,
@@ -1137,7 +1137,7 @@
         "y": 279.0710991052473
       },
       "rotationAngle": 0.41887902047864095,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 58,
@@ -1181,7 +1181,7 @@
         "y": 252.69931331090163
       },
       "rotationAngle": 5.654866776461631,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "2": {
           "polyId": 56,
@@ -1197,7 +1197,7 @@
         "y": 242.57351232820088
       },
       "rotationAngle": 3.9968028886505635e-15,
-      "color": "#FDFFB6",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 61,
@@ -1257,7 +1257,7 @@
         "y": 227.48010110163693
       },
       "rotationAngle": 0.20943951023932278,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 63,
@@ -1297,7 +1297,7 @@
         "y": 179.92727528687917
       },
       "rotationAngle": 0.20943951023932278,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "1": {
           "polyId": 63,
@@ -1313,7 +1313,7 @@
         "y": 279.0710991052474
       },
       "rotationAngle": 5.864306286700948,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 66,
@@ -1357,7 +1357,7 @@
         "y": 282.0885759255253
       },
       "rotationAngle": 0.6283185307179584,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "2": {
           "polyId": 65,
@@ -1373,7 +1373,7 @@
         "y": 213.18424971357757
       },
       "rotationAngle": 8.881784197001252e-16,
-      "color": "#FDFFB6",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 69,
@@ -1433,7 +1433,7 @@
         "y": 252.6993133109017
       },
       "rotationAngle": 5.654866776461628,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 68,
@@ -1473,7 +1473,7 @@
         "y": 223.310050696278
       },
       "rotationAngle": 1.4660765716752373,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "1": {
           "polyId": 72,
@@ -1489,7 +1489,7 @@
         "y": 333.6795739291356
       },
       "rotationAngle": 0.8377580409572785,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 75,
@@ -1526,22 +1526,6 @@
       }
     },
     {
-      "id": 76,
-      "sides": 3,
-      "centerPosition": {
-        "x": 716.6276266136958,
-        "y": 361.9162629586781
-      },
-      "rotationAngle": 6.073745796940267,
-      "color": "#FFADAD",
-      "connections": {
-        "0": {
-          "polyId": 74,
-          "edgeIndex": 1
-        }
-      }
-    },
-    {
       "id": 77,
       "sides": 5,
       "centerPosition": {
@@ -1549,7 +1533,7 @@
         "y": 329.4568483704845
       },
       "rotationAngle": 0,
-      "color": "#FDFFB6",
+      "color": "red",
       "connections": {
         "1": {
           "polyId": 78,
@@ -1577,7 +1561,7 @@
         "y": 314.36343714392035
       },
       "rotationAngle": 0.20943951023931826,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "2": {
           "polyId": 77,
@@ -1609,7 +1593,7 @@
         "y": 368.97191196780864
       },
       "rotationAngle": 0.6283185307179584,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 77,
@@ -1649,7 +1633,7 @@
         "y": 398.3611745824322
       },
       "rotationAngle": 0.6283185307179566,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "2": {
           "polyId": 81,
@@ -1665,7 +1649,7 @@
         "y": 367.4294674440914
       },
       "rotationAngle": 8.881784197001252e-16,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 55,
@@ -1689,7 +1673,7 @@
         "y": 381.8632241738321
       },
       "rotationAngle": 1.0471975511965976,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "0": {
           "polyId": 83,
@@ -1725,7 +1709,7 @@
         "y": 430.7065289153521
       },
       "rotationAngle": 0,
-      "color": "#FDFFB6",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 85,
@@ -1753,7 +1737,7 @@
         "y": 415.61311768878795
       },
       "rotationAngle": 6.073745796940268,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "1": {
           "polyId": 86,
@@ -1793,7 +1777,7 @@
         "y": 463.1659435035456
       },
       "rotationAngle": 6.0737457969402655,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "0": {
           "polyId": 88,
@@ -1825,11 +1809,27 @@
         "y": 470.22159251267624
       },
       "rotationAngle": 5.654866776461628,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 86,
           "edgeIndex": 2
+        }
+      }
+    },
+    {
+      "id": 76,
+      "sides": 3,
+      "centerPosition": {
+        "x": 716.6276266136958,
+        "y": 361.9162629586781
+      },
+      "rotationAngle": 6.073745796940267,
+      "color": "blue",
+      "connections": {
+        "0": {
+          "polyId": 74,
+          "edgeIndex": 1
         }
       }
     }

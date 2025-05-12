@@ -9,7 +9,7 @@
         "y": 376.29261779785156
       },
       "rotationAngle": 0,
-      "color": "#FFADAD",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 1,
@@ -49,7 +49,7 @@
         "y": 332.99134760862955
       },
       "rotationAngle": 0,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "1": {
           "polyId": 1,
@@ -65,7 +65,7 @@
         "y": 332.99134760862955
       },
       "rotationAngle": 8.881784197001252e-16,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "2": {
           "polyId": 1,

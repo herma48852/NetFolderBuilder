@@ -9,7 +9,7 @@
         "y": 421.29261779785156
       },
       "rotationAngle": 0,
-      "color": "#FDFFB6",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 1,
@@ -41,7 +41,7 @@
         "y": 352.47352177429286
       },
       "rotationAngle": 5.654866776461628,
-      "color": "#FDFFB6",
+      "color": "yellow",
       "connections": {
         "3": {
           "polyId": 0,
@@ -57,7 +57,7 @@
         "y": 400.0263475890506
       },
       "rotationAngle": 5.654866776461628,
-      "color": "#FDFFB6",
+      "color": "green",
       "connections": {
         "2": {
           "polyId": 0,
@@ -73,7 +73,7 @@
         "y": 476.96843601843193
       },
       "rotationAngle": 5.654866776461628,
-      "color": "#FDFFB6",
+      "color": "pink",
       "connections": {
         "1": {
           "polyId": 0,
@@ -89,7 +89,7 @@
         "y": 476.96843601843193
       },
       "rotationAngle": 5.654866776461628,
-      "color": "#FDFFB6",
+      "color": "orange",
       "connections": {
         "0": {
           "polyId": 0,
@@ -105,7 +105,7 @@
         "y": 400.0263475890506
       },
       "rotationAngle": 0.6283185307179593,
-      "color": "#FDFFB6",
+      "color": "blue",
       "connections": {
         "1": {
           "polyId": 6,
@@ -125,7 +125,7 @@
         "y": 421.2926177978517
       },
       "rotationAngle": 1.7763568394002505e-15,
-      "color": "#FDFFB6",
+      "color": "pink",
       "connections": {
         "1": {
           "polyId": 7,
@@ -145,7 +145,7 @@
         "y": 400.0263475890508
       },
       "rotationAngle": 0.6283185307179612,
-      "color": "#FDFFB6",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 9,
@@ -177,7 +177,7 @@
         "y": 344.35052936847035
       },
       "rotationAngle": 3.1086244689504383e-15,
-      "color": "#FDFFB6",
+      "color": "orange",
       "connections": {
         "2": {
           "polyId": 7,
@@ -193,7 +193,7 @@
         "y": 344.3505293684706
       },
       "rotationAngle": 2.6645352591003757e-15,
-      "color": "#FDFFB6",
+      "color": "blue",
       "connections": {
         "3": {
           "polyId": 7,
@@ -209,7 +209,7 @@
         "y": 421.29261779785196
       },
       "rotationAngle": 3.552713678800501e-15,
-      "color": "#FDFFB6",
+      "color": "yellow",
       "connections": {
         "4": {
           "polyId": 7,
@@ -225,7 +225,7 @@
         "y": 468.8454436126095
       },
       "rotationAngle": 2.220446049250313e-15,
-      "color": "#FDFFB6",
+      "color": "green",
       "connections": {
         "0": {
           "polyId": 7,

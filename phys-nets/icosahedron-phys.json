@@ -9,7 +9,7 @@
         "y": 331.29261779785156
       },
       "rotationAngle": 0,
-      "color": "#FFADAD",
+      "color": "green",
       "connections": {
         "0": {
           "polyId": 1,
@@ -25,7 +25,7 @@
         "y": 302.42510433837026
       },
       "rotationAngle": 1.0471975511965976,
-      "color": "#FFADAD",
+      "color": "orange",
       "connections": {
         "0": {
           "polyId": 4,
@@ -49,7 +49,7 @@
         "y": 287.99134760862955
       },
       "rotationAngle": 0,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "0": {
           "polyId": 3,
@@ -69,7 +69,7 @@
         "y": 259.12383414914825
       },
       "rotationAngle": 1.0471975511965976,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "1": {
           "polyId": 2,
@@ -85,7 +85,7 @@
         "y": 287.99134760862955
       },
       "rotationAngle": 8.881784197001252e-16,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "0": {
           "polyId": 5,
@@ -109,7 +109,7 @@
         "y": 259.1238341491483
       },
       "rotationAngle": 3.1415926535897944,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 4,
@@ -125,7 +125,7 @@
         "y": 302.42510433837026
       },
       "rotationAngle": 1.0471975511965994,
-      "color": "#FFADAD",
+      "color": "orange",
       "connections": {
         "0": {
           "polyId": 8,
@@ -149,7 +149,7 @@
         "y": 331.29261779785156
       },
       "rotationAngle": 2.220446049250313e-15,
-      "color": "#FFADAD",
+      "color": "green",
       "connections": {
         "0": {
           "polyId": 6,
@@ -165,7 +165,7 @@
         "y": 287.99134760862967
       },
       "rotationAngle": 2.6645352591003757e-15,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "0": {
           "polyId": 9,
@@ -189,7 +189,7 @@
         "y": 259.12383414914837
       },
       "rotationAngle": 3.1415926535897953,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 8,
@@ -205,7 +205,7 @@
         "y": 302.4251043383704
       },
       "rotationAngle": 1.0471975511966012,
-      "color": "#FFADAD",
+      "color": "orange",
       "connections": {
         "0": {
           "polyId": 12,
@@ -229,7 +229,7 @@
         "y": 331.29261779785156
       },
       "rotationAngle": 3.1086244689504383e-15,
-      "color": "#FFADAD",
+      "color": "green",
       "connections": {
         "0": {
           "polyId": 10,
@@ -245,7 +245,7 @@
         "y": 287.99134760862984
       },
       "rotationAngle": 4.440892098500626e-15,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "0": {
           "polyId": 13,
@@ -269,7 +269,7 @@
         "y": 259.12383414914854
       },
       "rotationAngle": 1.047197551196602,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "1": {
           "polyId": 12,
@@ -285,7 +285,7 @@
         "y": 302.4251043383706
       },
       "rotationAngle": 1.0471975511966012,
-      "color": "#FFADAD",
+      "color": "orange",
       "connections": {
         "0": {
           "polyId": 16,
@@ -309,7 +309,7 @@
         "y": 331.2926177978518
       },
       "rotationAngle": 3.1086244689504383e-15,
-      "color": "#FFADAD",
+      "color": "green",
       "connections": {
         "0": {
           "polyId": 14,
@@ -325,7 +325,7 @@
         "y": 287.99134760863006
       },
       "rotationAngle": 4.440892098500626e-15,
-      "color": "#FFADAD",
+      "color": "blue",
       "connections": {
         "0": {
           "polyId": 17,
@@ -349,7 +349,7 @@
         "y": 259.12383414914876
       },
       "rotationAngle": 1.047197551196602,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "1": {
           "polyId": 16,
@@ -365,7 +365,7 @@
         "y": 302.42510433837083
       },
       "rotationAngle": 1.047197551196602,
-      "color": "#FFADAD",
+      "color": "orange",
       "connections": {
         "1": {
           "polyId": 19,
@@ -385,7 +385,7 @@
         "y": 331.29261779785213
       },
       "rotationAngle": 4.440892098500626e-15,
-      "color": "#FFADAD",
+      "color": "green",
       "connections": {
         "0": {
           "polyId": 18,

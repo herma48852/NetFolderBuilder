@@ -9,7 +9,7 @@
         "y": 399.29261779785156
       },
       "rotationAngle": 0,
-      "color": "#FFD6A5",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 4,
@@ -37,7 +37,7 @@
         "y": 399.29261779785156
       },
       "rotationAngle": 5.759586531581288,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 2,
@@ -57,7 +57,7 @@
         "y": 365.1419827032406
       },
       "rotationAngle": 5.759586531581288,
-      "color": "#FFD6A5",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 3,
@@ -77,7 +77,7 @@
         "y": 330.99134760862967
       },
       "rotationAngle": 0.5235987755982997,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "1": {
           "polyId": 2,
@@ -93,7 +93,7 @@
         "y": 359.8588610681109
       },
       "rotationAngle": 1.0471975511965976,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "1": {
           "polyId": 0,
@@ -109,7 +109,7 @@
         "y": 399.29261779785156
       },
       "rotationAngle": 0.5235987755982987,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 6,
@@ -129,7 +129,7 @@
         "y": 365.1419827032406
       },
       "rotationAngle": 0.5235987755982988,
-      "color": "#FFD6A5",
+      "color": "red",
       "connections": {
         "2": {
           "polyId": 5,
@@ -145,7 +145,7 @@
         "y": 438.7263745275922
       },
       "rotationAngle": 0,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 0,
@@ -169,7 +169,7 @@
         "y": 458.4432528924625
       },
       "rotationAngle": 5.23598775598299,
-      "color": "#FFD6A5",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 7,
@@ -193,7 +193,7 @@
         "y": 478.16013125733286
       },
       "rotationAngle": 5.235987755982989,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 8,
@@ -209,7 +209,7 @@
         "y": 492.59388798707346
       },
       "rotationAngle": 0.5235987755982993,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 8,
@@ -229,7 +229,7 @@
         "y": 526.7445230816844
       },
       "rotationAngle": 5.759586531581288,
-      "color": "#FFD6A5",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 10,
@@ -245,7 +245,7 @@
         "y": 458.4432528924625
       },
       "rotationAngle": 5.759586531581287,
-      "color": "#FFD6A5",
+      "color": "red",
       "connections": {
         "1": {
           "polyId": 7,
@@ -265,7 +265,7 @@
         "y": 478.16013125733286
       },
       "rotationAngle": 5.235987755982988,
-      "color": "#FFADAD",
+      "color": "yellow",
       "connections": {
         "1": {
           "polyId": 12,

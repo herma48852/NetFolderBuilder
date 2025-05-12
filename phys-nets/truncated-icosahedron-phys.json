@@ -33,7 +33,7 @@
         "y": 529.8951581762955
       },
       "rotationAngle": 0,
-      "color": "#CAFFBF",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 0,
@@ -65,7 +65,7 @@
         "y": 399.99134760862967
       },
       "rotationAngle": 8.881784197001252e-16,
-      "color": "#CAFFBF",
+      "color": "green",
       "connections": {
         "0": {
           "polyId": 4,
@@ -153,7 +153,7 @@
         "y": 529.8951581762956
       },
       "rotationAngle": 8.881784197001252e-16,
-      "color": "#CAFFBF",
+      "color": "pink",
       "connections": {
         "0": {
           "polyId": 6,
@@ -185,7 +185,7 @@
         "y": 399.9913476086299
       },
       "rotationAngle": 1.7763568394002505e-15,
-      "color": "#CAFFBF",
+      "color": "green",
       "connections": {
         "0": {
           "polyId": 10,
@@ -213,7 +213,7 @@
         "y": 313.388807230186
       },
       "rotationAngle": 2.220446049250313e-15,
-      "color": "#CAFFBF",
+      "color": "pink",
       "connections": {
         "3": {
           "polyId": 9,
@@ -273,7 +273,7 @@
         "y": 529.8951581762959
       },
       "rotationAngle": 2.220446049250313e-15,
-      "color": "#CAFFBF",
+      "color": "green",
       "connections": {
         "0": {
           "polyId": 13,
@@ -309,7 +309,7 @@
         "y": 399.99134760863024
       },
       "rotationAngle": 2.6645352591003757e-15,
-      "color": "#CAFFBF",
+      "color": "green",
       "connections": {
         "0": {
           "polyId": 17,
@@ -417,7 +417,7 @@
         "y": 529.8951581762961
       },
       "rotationAngle": 3.1086244689504383e-15,
-      "color": "#CAFFBF",
+      "color": "pink",
       "connections": {
         "0": {
           "polyId": 20,
@@ -449,7 +449,7 @@
         "y": 399.99134760863063
       },
       "rotationAngle": 2.6645352591003757e-15,
-      "color": "#CAFFBF",
+      "color": "green",
       "connections": {
         "0": {
           "polyId": 24,
@@ -477,7 +477,7 @@
         "y": 313.3888072301867
       },
       "rotationAngle": 2.220446049250313e-15,
-      "color": "#CAFFBF",
+      "color": "pink",
       "connections": {
         "3": {
           "polyId": 23,
@@ -537,7 +537,7 @@
         "y": 529.8951581762966
       },
       "rotationAngle": 3.1086244689504383e-15,
-      "color": "#CAFFBF",
+      "color": "green",
       "connections": {
         "0": {
           "polyId": 26,
@@ -569,7 +569,7 @@
         "y": 399.99134760863103
       },
       "rotationAngle": 2.6645352591003757e-15,
-      "color": "#CAFFBF",
+      "color": "green",
       "connections": {
         "0": {
           "polyId": 30,
@@ -593,7 +593,7 @@
         "y": 313.3888072301871
       },
       "rotationAngle": 2.220446049250313e-15,
-      "color": "#CAFFBF",
+      "color": "red",
       "connections": {
         "3": {
           "polyId": 29,

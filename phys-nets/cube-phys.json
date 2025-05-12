@@ -5,11 +5,11 @@
       "id": 0,
       "sides": 4,
       "centerPosition": {
-        "x": 279.03125,
-        "y": 378.5625
+        "x": 424.0000305175781,
+        "y": 428.29261779785156
       },
       "rotationAngle": 0,
-      "color": "#FFD6A5",
+      "color": "yellow",
       "connections": {
         "0": {
           "polyId": 1,
@@ -21,11 +21,11 @@
       "id": 1,
       "sides": 4,
       "centerPosition": {
-        "x": 279.03125,
-        "y": 328.5625
+        "x": 424.0000305175781,
+        "y": 378.29261779785156
       },
       "rotationAngle": 0,
-      "color": "#FFD6A5",
+      "color": "green",
       "connections": {
         "0": {
           "polyId": 2,
@@ -41,11 +41,11 @@
       "id": 2,
       "sides": 4,
       "centerPosition": {
-        "x": 279.03125,
-        "y": 278.5625
+        "x": 424.0000305175781,
+        "y": 328.29261779785156
       },
       "rotationAngle": 0,
-      "color": "#FFD6A5",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 3,
@@ -69,11 +69,11 @@
       "id": 3,
       "sides": 4,
       "centerPosition": {
-        "x": 279.03125,
-        "y": 228.5625
+        "x": 424.0000305175781,
+        "y": 278.29261779785156
       },
       "rotationAngle": 0,
-      "color": "#FFD6A5",
+      "color": "blue",
       "connections": {
         "2": {
           "polyId": 2,
@@ -85,11 +85,11 @@
       "id": 4,
       "sides": 4,
       "centerPosition": {
-        "x": 229.03125,
-        "y": 278.5625
+        "x": 374.0000305175781,
+        "y": 328.29261779785156
       },
       "rotationAngle": 0,
-      "color": "#FFD6A5",
+      "color": "orange",
       "connections": {
         "1": {
           "polyId": 2,
@@ -101,11 +101,11 @@
       "id": 5,
       "sides": 4,
       "centerPosition": {
-        "x": 329.03125,
-        "y": 278.5625
+        "x": 474.0000305175781,
+        "y": 328.29261779785156
       },
       "rotationAngle": 0,
-      "color": "#FFD6A5",
+      "color": "pink",
       "connections": {
         "3": {
           "polyId": 2,
