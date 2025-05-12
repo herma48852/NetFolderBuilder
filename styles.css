@@ -233,4 +233,12 @@ h1 {
   z-index: 9999 !important;
 }
 
+/* Example styling */
+#palette-controls div label, 
+#foldingControls div label { 
+    cursor: pointer;
+}
+#toggleFaceNumbers {
+    margin-right: 5px;
+}
 

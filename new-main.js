@@ -306,7 +306,7 @@ for (const key in POLYHEDRON_DATA) {
 // --- DOM Elements ---
 let canvas, ctx, paletteDiv, paletteControlsDiv, paletteButtonsDiv;
 let saveButton, loadFileInput, clearButton, exportTopologicalButton;
-let switchTo3DButton, backTo2DButton, threeContainer;
+let switchTo3DButton, backTo2DButton, threeContainer, toggleFaceNumbersCheckbox;
 
 
 
@@ -316,6 +316,7 @@ let colorContextMenu = null;
 let colorMenuList = null;
 
 let pureColor = 0;
+let showFaceNumbers = false;
 
 // --- App 1 State ---
 let editorState = {
@@ -374,6 +375,7 @@ let foldingState = {
     speedValueSpan: null,
     toggleNormalsCheckbox: null,
     infoDisplay: null,
+    faceNumberLabels: {}, // For storing text sprites
 };
 
 // --- State Update Function (App 1) ---
@@ -613,6 +615,21 @@ export class Polygon {
         ctx.closePath();
         ctx.fill();
         ctx.stroke();
+
+        if (showFaceNumbers) {
+            // ctx.save(); // Not strictly necessary to save/restore again if careful
+            const textX = this.centerPosition.x + offsetX;
+            const textY = this.centerPosition.y + offsetY;
+
+            ctx.font = "bold 16px Arial"; // Adjust font size and style as needed
+            ctx.fillStyle = "black";    // Choose a contrasting color
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+
+            ctx.fillText((this.id + 1).toString(), textX, textY);
+            // ctx.restore(); // Only if you added an inner ctx.save()
+        }
+
         ctx.restore();
     }
 
@@ -1450,6 +1467,43 @@ function breakConnections(polygon, breakIncoming = false) {
         });
     }
 }
+
+function createTextSprite(message, parameters) {
+    parameters = parameters || {};
+    const fontface = parameters.fontface || 'Arial';
+    const fontsize = parameters.fontsize || 24; // Adjust for visibility
+    const W = 256, H = 128; // Canvas texture size, adjust as needed
+    // const W = 512, H = 256; // Canvas texture size, adjust as needed
+    const font = "bold " + fontsize + "px " + fontface;
+
+    const canvas = document.createElement('canvas');
+    canvas.width = W;
+    canvas.height = H;
+    const context = canvas.getContext('2d');
+    context.font = font;
+
+    // Background (optional, could be transparent)
+    // context.fillStyle = 'rgba(200, 200, 200, 0.7)';
+    // context.fillRect(0, 0, W, H);
+
+    // Text color
+    context.fillStyle = parameters.textColor || 'rgba(0, 0, 0, 1.0)';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText(message, W / 2, H / 2);
+
+    const texture = new THREE.Texture(canvas);
+    texture.needsUpdate = true;
+
+    const spriteMaterial = new THREE.SpriteMaterial({ map: texture });
+    const sprite = new THREE.Sprite(spriteMaterial);
+
+    // Scale the sprite appropriately. Size depends on your scene units.
+    // This needs experimentation.
+    sprite.scale.set(5, 2.5, 1.0); // Adjust these values
+
+    return sprite;
+}
 /////////////////////////
 // end of interaction.js section
 /////////////////////////
@@ -1767,113 +1821,158 @@ export function handleFileLoad(event) {
 // start of topological export section
 ///////////////////////////////////
 function convertNetToTopologicalFormat() {
-    const polygons = editorState.netPolygons;
-    if (!polygons || polygons.length === 0) {
-        console.warn("Cannot convert empty net.");
-        alert("Net is empty.");
+    // ===== START OF CRITICAL DEBUGGING LOGS & GUARDS =====
+    console.log("[ConvertTopo] Function Start. Current editorState.netPolygons:", editorState.netPolygons);
+    if (editorState.netPolygons === undefined) {
+        console.error("[ConvertTopo] CRITICAL ERROR: editorState.netPolygons is UNDEFINED at function start!");
+        alert("Error: Net data (editorState.netPolygons) is undefined. Cannot convert to 3D.");
         return null;
     }
+    if (!Array.isArray(editorState.netPolygons)) {
+        console.error("[ConvertTopo] CRITICAL ERROR: editorState.netPolygons is NOT AN ARRAY at function start! Type:", typeof editorState.netPolygons);
+        alert("Error: Net data (editorState.netPolygons) is not an array. Cannot convert to 3D.");
+        return null;
+    }
+    console.log("[ConvertTopo] Number of polygons from editorState before assigning to 'polygons':", editorState.netPolygons.length);
+    // ===== END OF CRITICAL DEBUGGING LOGS & GUARDS =====
+
+    const polygons = editorState.netPolygons; // This 'polygons' variable is what .reduce is called on
+
+    if (polygons.length === 0) {
+        console.warn("[ConvertTopo] Net is empty (polygons.length is 0 after assignment).");
+        alert("Net is empty. Add polygons before converting to 3D.");
+        return null;
+    }
+
+    // Additional logging for the polygons array right before reduce
+    console.log("[ConvertTopo] 'polygons' variable to be used in reduce:", polygons);
+    console.log("[ConvertTopo] Length of 'polygons' array:", polygons.length);
+
+
     let basePolygonApp1 = null;
     try {
+        // This is your line ~1827 where the error occurs if 'polygons' is undefined or not an array
         basePolygonApp1 = polygons.reduce(
-            (minPoly, currentPoly) =>
-                !minPoly || currentPoly.id < minPoly.id ? currentPoly : minPoly,
+            (minPoly, currentPoly) => {
+                if (!currentPoly || typeof currentPoly.id !== 'number') {
+                    console.warn("[ConvertTopo] Reduce: Skipping invalid polygon object or polygon with invalid id:", currentPoly);
+                    return minPoly;
+                }
+                return !minPoly || currentPoly.id < minPoly.id ? currentPoly : minPoly;
+            },
             null,
         );
     } catch (e) {
-        console.error("Error finding base polygon:", e);
-        alert("Error finding base polygon.");
+        console.error("[ConvertTopo] Error during polygons.reduce():", e);
+        console.error("[ConvertTopo] 'polygons' variable at time of error:", polygons); // Log polygons again if reduce fails
+        alert("Error processing net polygons to find a base face. Check console.");
         return null;
     }
+
+
     if (!basePolygonApp1) {
-        console.error("Could not determine base polygon.");
-        alert("Error finding base polygon.");
+        console.error("[ConvertTopo] Could not determine base polygon from the net. This can happen if the 'polygons' array was empty or all polygons were invalid. Processed polygons array:", polygons);
+        alert("Error: Could not determine a base polygon for the 3D net. The 2D net might be effectively empty or corrupted.");
         return null;
     }
-    console.log(
-        `Using App 1 polygon ID ${basePolygonApp1.id} as base face (will be exported as ID 1).`,
-    );
+
+    console.log("[ConvertTopo] Using App 1 polygon ID", basePolygonApp1.id, "as base face (will be exported as ID 1).");
+    console.log("[ConvertTopo] Base polygon object:", basePolygonApp1);
+
+
     const oldIdToNewId = new Map();
     const connectionsApp2 = [];
-    let nextNewId = 2;
-    const queue = [basePolygonApp1];
-    const visitedApp1Ids = new Set([basePolygonApp1.id]);
+    let nextNewId = 2; // Traversal-based ID for connections array structure and folding stages
+
+    const polygonMapApp1 = new Map(polygons.map((p) => [p.id, p]));
+
     oldIdToNewId.set(basePolygonApp1.id, 1);
+
     const topologicalNet = {
-        description: `User-generated Net (App 1 Base ID: ${basePolygonApp1.id})`,
+        description: `User-generated Net (App 1 Base ID: ${basePolygonApp1.id})`, // Original 2D ID of base
         baseFace: {
             noSides: basePolygonApp1.sides,
             color: basePolygonApp1.color,
+            originalId: basePolygonApp1.id // Store original 2D ID
         },
         connections: connectionsApp2,
     };
-    const polygonMapApp1 = new Map(polygons.map((p) => [p.id, p]));
+
+    const queue = [basePolygonApp1];
+    const visitedApp1Ids = new Set([basePolygonApp1.id]); // Store original 2D IDs
+
     while (queue.length > 0) {
         const currentPolyApp1 = queue.shift();
-        const currentNewId = oldIdToNewId.get(currentPolyApp1.id);
+        const currentNewTraversalId = oldIdToNewId.get(currentPolyApp1.id);
+
         for (const edgeIndexStr in currentPolyApp1.connections) {
             const edgeIndexApp1 = parseInt(edgeIndexStr, 10);
             const connectionInfo = currentPolyApp1.connections[edgeIndexApp1];
-            const neighborIdApp1 = connectionInfo.polyId;
+            const neighborIdApp1 = connectionInfo.polyId; // This is the original 2D ID of the neighbor
             const neighborEdgeIndexApp1 = connectionInfo.edgeIndex;
-            if (
-                polygonMapApp1.has(neighborIdApp1) &&
-                !visitedApp1Ids.has(neighborIdApp1)
-            ) {
+
+            if (polygonMapApp1.has(neighborIdApp1) && !visitedApp1Ids.has(neighborIdApp1)) {
                 const neighborPolyApp1 = polygonMapApp1.get(neighborIdApp1);
                 visitedApp1Ids.add(neighborIdApp1);
-                const neighborNewId = nextNewId++;
-                oldIdToNewId.set(neighborIdApp1, neighborNewId);
+
+                const neighborNewTraversalId = nextNewId++;
+                oldIdToNewId.set(neighborIdApp1, neighborNewTraversalId);
                 queue.push(neighborPolyApp1);
-                const toEdgeVertices =
-                    currentPolyApp1.getEdgeVertices(edgeIndexApp1);
-                const fromEdgeVertices = neighborPolyApp1.getEdgeVertices(
-                    neighborEdgeIndexApp1,
-                );
-                if (!toEdgeVertices || !fromEdgeVertices) {
+
+                const toEdgeVertices = currentPolyApp1.getEdgeVertices(edgeIndexApp1);
+                const fromEdgeVerticesLocal = neighborPolyApp1.getEdgeVertices(neighborEdgeIndexApp1);
+
+                if (!toEdgeVertices || !fromEdgeVerticesLocal) {
                     console.error(
-                        `Failed to get edge vertices for connection: App1 IDs ${currentPolyApp1.id}[${edgeIndexApp1}] <-> ${neighborIdApp1}[${neighborEdgeIndexApp1}]`,
+                        `[ConvertTopo] Failed to get edge vertices for connection: App1 IDs ${currentPolyApp1.id}[${edgeIndexApp1}] <-> ${neighborIdApp1}[${neighborEdgeIndexApp1}]`
                     );
                     continue;
                 }
-                const reversedFromEdgeVertices = [
-                    fromEdgeVertices[1],
-                    fromEdgeVertices[0],
-                ];
+                const reversedFromEdgeVertices = [fromEdgeVerticesLocal[1], fromEdgeVerticesLocal[0]];
+
                 connectionsApp2.push({
-                    from: neighborNewId,
+                    from: neighborNewTraversalId,
                     noSides: neighborPolyApp1.sides,
                     color: neighborPolyApp1.color,
+                    originalId: neighborPolyApp1.id, // Store original 2D ID of the neighbor
                     fromEdge: reversedFromEdgeVertices,
-                    to: currentNewId,
+                    to: currentNewTraversalId,
                     toEdge: toEdgeVertices,
                 });
             } else if (!polygonMapApp1.has(neighborIdApp1)) {
                 console.warn(
-                    `Connection references non-existent App 1 polygon ID ${neighborIdApp1} from polygon ${currentPolyApp1.id}`,
+                    `[ConvertTopo] Connection references non-existent App 1 polygon ID ${neighborIdApp1} from polygon ${currentPolyApp1.id}`
                 );
             }
         }
     }
+
+    // Additional final logs
+    console.log("[ConvertTopo] Number of 2D polygons originally passed to function:", polygons.length);
+    console.log("[ConvertTopo] Max original 2D polygon ID found in net:", polygons.reduce((max, p) => Math.max(max, (p && typeof p.id === 'number' ? p.id : -1)), -1));
+    console.log("[ConvertTopo] Number of 3D faces identified (visitedApp1Ids.size):", visitedApp1Ids.size);
+    console.log("[ConvertTopo] Highest new 3D (traversal) ID assigned (nextNewId - 1):", nextNewId - 1);
+    console.log("[ConvertTopo] Number of connections generated for 3D net:", connectionsApp2.length);
+    console.log("[ConvertTopo] oldIdToNewId map:", oldIdToNewId); // Log the map to see the full mapping
+
+
     if (visitedApp1Ids.size !== polygons.length) {
         console.warn(
-            `Topological export incomplete. Visited ${visitedApp1Ids.size}/${polygons.length} polygons.`,
+            `[ConvertTopo] Topological export might be incomplete or net has disjoint parts. Visited ${visitedApp1Ids.size}/${polygons.length} polygons.`
         );
-        alert(
-            `Warning: Exported net may be incomplete (${visitedApp1Ids.size}/${polygons.length} included).`,
-        );
+        // alert( // Consider if this alert is too intrusive
+        //     `Warning: Exported net may be incomplete or disjoint (${visitedApp1Ids.size}/${polygons.length} included).`
+        // );
     }
-    topologicalNet.description += ` (${connectionsApp2.length} connections)`;
-    console.log(
-        "Generated Topological Net (Renumbered):",
-        JSON.stringify(topologicalNet, null, 2),
-    );
-    console.log(
-        "--- Output from convertNetToTopologicalFormat (for export/internal use) ---",
-    );
-    console.log(JSON.stringify(topologicalNet, null, 2));
+    topologicalNet.description += ` (${connectionsApp2.length} connections, ${visitedApp1Ids.size} faces processed)`;
+    console.log("[ConvertTopo] Generated Topological Net (Renumbered):", JSON.parse(JSON.stringify(topologicalNet))); // Deep copy for logging
+    console.log("--- Output from convertNetToTopologicalFormat (for export/internal use) ---");
+    console.log(JSON.parse(JSON.stringify(topologicalNet)));
+
     return topologicalNet;
 }
+
+
 function downloadJson(data, filename) {
     if (!data) {
         console.error("No data for download.");
@@ -2025,9 +2124,14 @@ function calculateLocalNormal(localVerts) {
     const edge1 = new THREE.Vector3().subVectors(vB, vA);
     const edge2 = new THREE.Vector3().subVectors(vC, vA);
     const normal = new THREE.Vector3().crossVectors(edge1, edge2).normalize();
-    if (normal.y < -0.1) normal.negate();
-    return normal;
+
+    // For 3D context, consider removing or conditionalizing this flip:
+    // if (normal.y < -0.1) normal.negate(); 
+    // For now, let's assume the geometric normal is what we need for the ArrowHelper's direction.
+    return normal; 
 }
+
+
 function calculateLocalCenter(localVerts) {
     const center = new THREE.Vector3();
     let count = 0;
@@ -2171,6 +2275,7 @@ function setupEventListeners() {
     canvas.addEventListener("mouseup", handleMouseUp);
     canvas.addEventListener("mouseleave", handleMouseLeave);
 
+    
     // --- ADD Right-Click Context Menu Listener ---
     // Only add the listener if the context menu element was found
     if (colorContextMenu) {
@@ -2423,6 +2528,20 @@ function clearFoldingSceneGeometry() {
     foldingState.targetQuaternions = {};
     if (foldingState.foldButton) foldingState.foldButton.textContent = "Fold";
     if (foldingState.pauseButton) foldingState.pauseButton.disabled = true;
+
+    // Clear face number labels
+    if (foldingState.faceNumberLabels) {
+        Object.keys(foldingState.faceNumberLabels).forEach(key => {
+            const label = foldingState.faceNumberLabels[key];
+            if (label) {
+                if (label.material && label.material.map) label.material.map.dispose();
+                if (label.material) label.material.dispose();
+                if (label.parent) label.parent.remove(label);
+            }
+        });
+        foldingState.faceNumberLabels = {}; // Reset the collection
+    }
+    
     console.log("Folding scene clear complete.");
     const pivotCountAfter = Object.keys(foldingState.pivots).length;
     console.log(
@@ -2475,42 +2594,82 @@ function createRegularPolygonGeometry(vertices) {
 }
 
 function createFoldingNetGeometry(netData) {
-    // --- Create Folding Net Geometry ---
+    // --- Add console logging ---
+    console.log(
+        "--- [Debug 3D Geo] Entering createFoldingNetGeometry ---",
+    );
+    console.log(
+        "[Debug 3D Geo] Received netData:",
+        JSON.parse(JSON.stringify(netData)),
+    ); // Deep copy for logging
+
     console.log("Creating net geometry from loaded data...");
     const L = foldingState.sideLength;
-    clearFoldingSceneGeometry();
+    clearFoldingSceneGeometry(); // Existing call to clear previous geometry
+
+    // Ensure netData and connections exist before proceeding
+    if (!netData || !netData.baseFace || !netData.connections) {
+        console.error(
+            "[Debug 3D Geo] Error: Invalid netData structure received.",
+            netData,
+        );
+        alert(
+            "Error: Cannot create 3D geometry due to invalid net data.",
+        );
+        return; // Stop execution if data is invalid
+    }
+
+    const connections = netData.connections; // Use the connections array from netData
 
     try {
+        // --- Base Face Processing ---
         const baseFaceSides = netData.baseFace.noSides;
         const baseFaceColorValue = parseColorFolding(netData.baseFace.color);
-        foldingState.allVertices[1] = calculateBaseRegularPolygonVertices(baseFaceSides, L);
+        const baseOriginalId = netData.baseFace.originalId; // Get original ID
+
+        foldingState.allVertices[1] = calculateBaseRegularPolygonVertices(
+            baseFaceSides,
+            L,
+        );
         foldingState.allVertices[1].numSides = baseFaceSides;
-        const baseGeom = createRegularPolygonGeometry(foldingState.allVertices[1]);
+        const baseGeom = createRegularPolygonGeometry(
+            foldingState.allVertices[1],
+        );
         if (
             !baseGeom.attributes.position ||
             baseGeom.attributes.position.count === 0
         )
             throw new Error("Base geometry creation failed.");
 
-	let baseMat;
-	if (pureColor) {
+        let baseMat;
+        if (pureColor) {
             baseMat = new THREE.MeshBasicMaterial({
-		color: baseFaceColorValue,
-		side: THREE.DoubleSide,
-	    });
-	}
-	else {
-            baseMat = new THREE.MeshStandardMaterial({
-		color: baseFaceColorValue,
-		side: THREE.DoubleSide,
-		roughness: 0.8,
+                color: baseFaceColorValue,
+                side: THREE.DoubleSide,
             });
-	}
+        } else {
+            baseMat = new THREE.MeshStandardMaterial({
+                color: baseFaceColorValue,
+                side: THREE.DoubleSide,
+                roughness: 0.8,
+            });
+        }
         foldingState.f1Mesh = new THREE.Mesh(baseGeom, baseMat);
+        if (foldingState.f1Mesh) {
+            // --- Add console logging ---
+            console.log(
+                `[Debug 3D Geo] Base Face (Traversal ID 1): Assigning userData.faceId = 1. Original 2D ID was: ${baseOriginalId}`,
+            );
+            foldingState.f1Mesh.userData.faceId = 1; // Traversal ID is always 1 for base
+        }
         foldingState.scene.add(foldingState.f1Mesh);
 
-        const f1LocalCenter = calculateLocalCenter(foldingState.allVertices[1]);
-        const f1LocalNormal = calculateLocalNormal(foldingState.allVertices[1]);
+        const f1LocalCenter = calculateLocalCenter(
+            foldingState.allVertices[1],
+        );
+        const f1LocalNormal = calculateLocalNormal(
+            foldingState.allVertices[1],
+        );
         const arrowHelper1 = new THREE.ArrowHelper(
             f1LocalNormal,
             f1LocalCenter,
@@ -2522,7 +2681,25 @@ function createFoldingNetGeometry(netData) {
         foldingState.f1Mesh.add(arrowHelper1);
         foldingState.normalHelpers[1] = arrowHelper1;
 
-        const connections = netData.connections;
+        // --- Base Face Label (if enabled) ---
+        if (showFaceNumbers && foldingState.f1Mesh) {
+            const labelText = (baseOriginalId + 1).toString(); // Use originalId + 1
+            // --- Add console logging ---
+            console.log(
+                `[Debug 3D Geo] Base Face (Traversal ID 1): Creating Label. Original ID: ${baseOriginalId}, Label Text: "${labelText}"`,
+            );
+            const textSpriteBase = createTextSprite(labelText, {
+                /* options */
+            });
+            const EPSILON_LABEL = 0.1; // Small offset for labels
+            textSpriteBase.position
+                .copy(f1LocalCenter)
+                .add(f1LocalNormal.clone().multiplyScalar(EPSILON_LABEL));
+            foldingState.f1Mesh.add(textSpriteBase);
+            foldingState.faceNumberLabels["text_1"] = textSpriteBase; // Keyed by traversal ID
+        }
+
+        // Temporary vectors for calculations within the loop
         const tempVec1 = new THREE.Vector3();
         const tempVec2 = new THREE.Vector3();
         const Q = new THREE.Vector3();
@@ -2530,48 +2707,66 @@ function createFoldingNetGeometry(netData) {
         const tempQuatInv = new THREE.Quaternion();
         const tempWorldPos = new THREE.Vector3();
 
+        // --- Connected Faces Processing (Loop) ---
         for (const conn of connections) {
-            const i = conn.from;
-            const j = conn.to;
-            const k = conn.noSides;
+            // --- Add console logging ---
+            console.log(
+                `--- [Debug 3D Geo] Processing Connection: ---`,
+                conn,
+            );
+
+            const i_traversalId = conn.from; // Traversal ID for this face (e.g., 2 to N)
+            const j_parentTraversalId = conn.to; // Traversal ID for the parent face (e.g., 1 or higher)
+            const k_sides = conn.noSides;
             const colorInput = conn.color;
-            // Corrected Check: Allow 'to' ID (j) to be 0, but check types and minimum sides
+            const original_2D_Id = conn.originalId; // <<<< The Original 2D ID stored for this face
+
+            // --- Add console logging ---
+            console.log(
+                `[Debug 3D Geo] Face Traversal ID: ${i_traversalId}, Parent Traversal ID: ${j_parentTraversalId}, Sides: ${k_sides}, Original 2D ID: ${original_2D_Id}`,
+            );
+
+            // Input validation
             if (
-                typeof i !== "number" ||
-                typeof j !== "number" ||
-                j < 0 ||
-                typeof k !== "number" ||
-                k < 3
+                typeof i_traversalId !== "number" ||
+                typeof j_parentTraversalId !== "number" ||
+                j_parentTraversalId < 1 || // Parent ID must be 1 or greater
+                typeof k_sides !== "number" ||
+                k_sides < 3 ||
+                original_2D_Id === undefined || original_2D_Id === null // Check original ID exists
             ) {
                 console.warn(
-                    `Skipping invalid connection definition (missing or invalid type/value):`,
+                    `[Debug 3D Geo] Skipping invalid connection definition (missing/invalid IDs, sides, or originalId):`,
                     conn,
                 );
-                continue;
+                continue; // Skip this connection
             }
 
-            let parentVertices = j === 1 ? foldingState.allVertices[1] : foldingState.allVertices[j];
-	    
+            // Get parent vertices based on parent's traversal ID
+            let parentVertices = foldingState.allVertices[j_parentTraversalId];
             if (!parentVertices?.numSides) {
                 console.error(
-                    `Net Gen Error: Parent F${j} vertices not found for F${i}`,
+                    `[Debug 3D Geo] Net Gen Error: Parent F${j_parentTraversalId} vertices not found for F${i_traversalId}`,
                 );
                 continue;
             }
 
-            const Fi_base_vertices = calculateBaseRegularPolygonVertices(k, L);
+            // Geometry calculations (as before)
+            const Fi_base_vertices = calculateBaseRegularPolygonVertices(
+                k_sides, L,
+            );
             const Fi_M_vertex_index = conn.fromEdge[0];
             const Fi_N_vertex_index = conn.fromEdge[1];
             if (
                 Fi_M_vertex_index === undefined ||
                 Fi_M_vertex_index < 0 ||
-                Fi_M_vertex_index >= k ||
+                Fi_M_vertex_index >= k_sides ||
                 Fi_N_vertex_index === undefined ||
                 Fi_N_vertex_index < 0 ||
-                Fi_N_vertex_index >= k
+                Fi_N_vertex_index >= k_sides
             ) {
                 console.warn(
-                    `Skipping F${i}: Invalid fromEdge indices ${conn.fromEdge}`,
+                    `[Debug 3D Geo] Skipping F${i_traversalId}: Invalid fromEdge indices ${conn.fromEdge}`,
                 );
                 continue;
             }
@@ -2592,7 +2787,7 @@ function createFoldingNetGeometry(netData) {
                 Fj_S_vertex_index >= parentNumSides
             ) {
                 console.warn(
-                    `Skipping F${i}: Invalid toEdge indices ${conn.toEdge} for parent F${j}`,
+                    `[Debug 3D Geo] Skipping F${i_traversalId}: Invalid toEdge indices ${conn.toEdge} for parent F${j_parentTraversalId}`,
                 );
                 continue;
             }
@@ -2600,7 +2795,7 @@ function createFoldingNetGeometry(netData) {
             const Fj_S_vertex = parentVertices[Fj_S_vertex_index];
             if (!Fj_R_vertex || !Fj_S_vertex) {
                 console.error(
-                    `Net Gen Error: Parent F${j} R/S vertices missing for F${i}`,
+                    `[Debug 3D Geo] Net Gen Error: Parent F${j_parentTraversalId} R/S vertices missing for F${i_traversalId}`,
                 );
                 continue;
             }
@@ -2627,109 +2822,160 @@ function createFoldingNetGeometry(netData) {
                 v.clone().add(Q),
             );
 
-            foldingState.allVertices[i] = Fi_final_world_vertices;
-            foldingState.allVertices[i].numSides = k;
-            foldingState.allVertices[i].conn = {
+            foldingState.allVertices[i_traversalId] = Fi_final_world_vertices;
+            foldingState.allVertices[i_traversalId].numSides = k_sides;
+            foldingState.allVertices[i_traversalId].conn = {
                 R_idx: Fi_M_vertex_index,
                 S_idx: Fi_N_vertex_index,
             };
 
-	    const fi_worldVertices = foldingState.allVertices[i];
-	    let parentObject = j === 1 ? foldingState.scene : foldingState.pivots[j];
-	    if (!parentObject) {
-		console.error(
-		    `Net Gen Error: Parent object not found for F${i}`,
-		);
-		continue;
-	    }
-	    const fj_R_target = Fj_R_vertex;
-	    const fj_S_target = Fj_S_vertex;
-	    const edgeMidpointWorld = fj_R_target
-		.clone()
-		.add(fj_S_target)
-		.multiplyScalar(0.5);
-	    const edgeAxisWorld = fj_R_target
-		.clone()
-		.sub(fj_S_target)
-		.normalize();
-	    const pivot = new THREE.Group();
-	    foldingState.pivots[i] = pivot;
-	    parentObject.updateWorldMatrix(true, true);
-	    tempMatrix.copy(parentObject.matrixWorld).invert();
-	    pivot.position.copy(edgeMidpointWorld).applyMatrix4(tempMatrix);
-	    tempQuatInv
-		.copy(
-		    parentObject.getWorldQuaternion(new THREE.Quaternion()),
-		)
-		.invert();
-	    pivot.userData.axis = edgeAxisWorld
-		.clone()
-		.applyQuaternion(tempQuatInv);
-	    pivot.quaternion.identity();
-	    parentObject.add(pivot);
-	    pivot.getWorldPosition(tempWorldPos);
-	    const pivotWorldQuaternionInv = pivot
-		.getWorldQuaternion(new THREE.Quaternion())
-		.invert();
-	    const fi_localVertices = fi_worldVertices.map((worldVert) =>
-		worldVert
-		    .clone()
-		    .sub(tempWorldPos)
-		    .applyQuaternion(pivotWorldQuaternionInv),
-	    );
-	    const geometry = createRegularPolygonGeometry(fi_localVertices);
-	    if (
-		!geometry.attributes.position ||
-		geometry.attributes.position.count === 0
-	    )
-		throw new Error(`Geometry creation failed for F${i}`);
-	    const colorValue = parseColorFolding(colorInput);
+            // --- Pivot and Mesh Creation ---
+            const fi_worldVertices = foldingState.allVertices[i_traversalId];
+            // Determine parent object in the THREE scene graph
+            let parentObject = (j_parentTraversalId === 1) ? foldingState.f1Mesh : foldingState.pivots[j_parentTraversalId];
 
-	    let material;
-	    if (pureColor) {
-		material = new THREE.MeshBasicMaterial({
-		    color: colorValue,
-		    side: THREE.DoubleSide,
-		});
-	    } else {
-		material = new THREE.MeshStandardMaterial({
-		    color: colorValue,
-		    side: THREE.DoubleSide,
-		    roughness: 0.8,
-		});
-	    }
-	    const faceMesh = new THREE.Mesh(geometry, material);
-	    faceMesh.position.set(0, 0, 0);
-	    pivot.add(faceMesh);
-	    const localCenter = calculateLocalCenter(fi_localVertices);
-	    const localNormal = calculateLocalNormal(fi_localVertices);
-	    const arrowHelper = new THREE.ArrowHelper(
-		localNormal,
-		localCenter,
-		L / 2,
-		0x000000,
-		L / 4,
-		L / 8,
-	    );
-	    pivot.add(arrowHelper);
-	    foldingState.normalHelpers[i] = arrowHelper;
+            // Ensure parent object exists
+            if (!parentObject) {
+                console.error(
+                    `[Debug 3D Geo] Net Gen Error: Parent THREE object not found for parent traversal ID ${j_parentTraversalId} (Needed for Face ${i_traversalId})`,
+                );
+                continue; // Skip if parent doesn't exist in scene graph
+            }
 
-        }
+            const fj_R_target = Fj_R_vertex;
+            const fj_S_target = Fj_S_vertex;
+            const edgeMidpointWorld = fj_R_target
+                .clone()
+                .add(fj_S_target)
+                .multiplyScalar(0.5);
+            const edgeAxisWorld = fj_R_target
+                .clone()
+                .sub(fj_S_target)
+                .normalize();
+            const pivot = new THREE.Group();
+            foldingState.pivots[i_traversalId] = pivot; // Store pivot by traversal ID
+
+            parentObject.updateWorldMatrix(true, true);
+            tempMatrix.copy(parentObject.matrixWorld).invert();
+            pivot.position.copy(edgeMidpointWorld).applyMatrix4(tempMatrix);
+            tempQuatInv
+                .copy(parentObject.getWorldQuaternion(new THREE.Quaternion()))
+                .invert();
+            pivot.userData.axis = edgeAxisWorld
+                .clone()
+                .applyQuaternion(tempQuatInv);
+            pivot.quaternion.identity();
+            parentObject.add(pivot); // Add pivot to the correct parent object
+
+            pivot.getWorldPosition(tempWorldPos); // Get world position of the pivot itself
+            const pivotWorldQuaternionInv = pivot
+                .getWorldQuaternion(new THREE.Quaternion())
+                .invert(); // Get pivot's world rotation inverse
+
+            // Transform face vertices into the pivot's local coordinate system
+            const fi_localVertices = fi_worldVertices.map((worldVert) =>
+                worldVert
+                    .clone()
+                    .sub(tempWorldPos) // Make relative to pivot's world origin
+                    .applyQuaternion(pivotWorldQuaternionInv), // Rotate into pivot's orientation
+            );
+
+            const geometry = createRegularPolygonGeometry(fi_localVertices);
+            if (
+                !geometry.attributes.position ||
+                geometry.attributes.position.count === 0
+            )
+                throw new Error(
+                    `Geometry creation failed for F${i_traversalId}`,
+                );
+            const colorValue = parseColorFolding(colorInput);
+
+            let material;
+            if (pureColor) {
+                material = new THREE.MeshBasicMaterial({
+                    color: colorValue,
+                    side: THREE.DoubleSide,
+                });
+            } else {
+                material = new THREE.MeshStandardMaterial({
+                    color: colorValue,
+                    side: THREE.DoubleSide,
+                    roughness: 0.8,
+                });
+            }
+            const faceMesh = new THREE.Mesh(geometry, material);
+
+            // --- Add console logging ---
+            console.log(
+                `[Debug 3D Geo] Face Traversal ID ${i_traversalId}: Assigning userData.faceId = ${i_traversalId}`,
+            );
+            faceMesh.userData.faceId = i_traversalId; // Assign traversal ID to mesh user data
+
+            faceMesh.position.set(0, 0, 0); // Mesh is positioned relative to pivot
+            pivot.add(faceMesh); // Add mesh as child of the pivot
+
+            // --- Normal Helper ---
+            const localCenter = calculateLocalCenter(fi_localVertices);
+            const localNormal = calculateLocalNormal(fi_localVertices);
+            const arrowHelper = new THREE.ArrowHelper(
+                localNormal,
+                localCenter,
+                L / 2,
+                0x000000,
+                L / 4,
+                L / 8,
+            );
+            // --- IMPORTANT: Add arrow helper to PIVOT, not mesh ---
+            pivot.add(arrowHelper);
+            foldingState.normalHelpers[i_traversalId] = arrowHelper;
+
+            // --- Connected Face Label (if enabled) ---
+            if (showFaceNumbers) {
+                const labelText = (original_2D_Id + 1).toString(); // Use originalId + 1
+                // --- Add console logging ---
+                console.log(
+                    `[Debug 3D Geo] Face Traversal ID ${i_traversalId}: Creating Label. Original ID: ${original_2D_Id}, Label Text: "${labelText}"`,
+                );
+                const textSprite = createTextSprite(labelText, {
+                    /* options */
+                });
+                const EPSILON_LABEL = 0.1; // Small offset for labels
+                // Position relative to pivot, offset along local normal
+                textSprite.position
+                    .copy(localCenter)
+                    .add(localNormal.clone().multiplyScalar(EPSILON_LABEL));
+
+                pivot.add(textSprite); // Add label sprite to the PIVOT
+                foldingState.faceNumberLabels[`text_${i_traversalId}`] = textSprite; // Key label storage by traversal ID
+            }
+             console.log(
+                `--- [Debug 3D Geo] Finished Processing Connection for Traversal ID ${i_traversalId} ---`,
+             );
+
+        } // --- End of Connections Loop ---
+
         console.log("Finished creating net geometry.");
 
+        // Set visibility of normal helpers based on checkbox state
         if (foldingState.toggleNormalsCheckbox)
             setNormalHelpersVisibility(
-		    foldingState.toggleNormalsCheckbox.checked);
+                foldingState.toggleNormalsCheckbox.checked,
+            );
+        else setNormalHelpersVisibility(false); // Default to hidden if checkbox missing
 
-        else setNormalHelpersVisibility(false);
     } catch (error) {
-        console.error("Error during net creation:", error);
+        console.error("[Debug 3D Geo] Error during net creation:", error);
         alert(
             "An error occurred while creating the net geometry. Check console.",
         );
-        clearFoldingSceneGeometry();
+        clearFoldingSceneGeometry(); // Clear scene on error
+    } finally {
+        console.log(
+            "--- [Debug 3D Geo] Exiting createFoldingNetGeometry ---",
+        );
     }
-}
+} // --- End of createFoldingNetGeometry ---
+
 
 // --- Replace entire function (Manual BBox, Aspect Corrected Dist, Origin Target) ---
 function fitFoldingCameraToNet() {
@@ -2943,16 +3189,22 @@ function getPivotsForStage(stage) {
 
 function triggerAnimationStage(stage) {
     // Uses foldingState
+    console.log(`[Anim Trigger] Stage ${stage} requested.`); // Log requested stage
     if (!foldingState.currentFoldAngles) {
         console.warn(
-            "Folding: Cannot trigger animation: Fold angles not loaded.",
+            "[Anim Trigger] Cannot trigger animation: Fold angles not loaded.",
         );
         foldingState.isAnimating = false;
         return;
     }
     foldingState.currentAnimationStage = stage;
     foldingState.pivotsInCurrentStage = getPivotsForStage(stage);
+    console.log(
+        `[Anim Trigger] Stage ${stage}. Pivots to animate: [${foldingState.pivotsInCurrentStage.join(", ")}]`,
+    );
+
     if (foldingState.pivotsInCurrentStage.length === 0) {
+        // Handles animation completion or invalid stage
         foldingState.isAnimating = false;
         foldingState.currentAnimationStage = 0;
         if (foldingState.pauseButton) foldingState.pauseButton.disabled = true;
@@ -2960,132 +3212,154 @@ function triggerAnimationStage(stage) {
             foldingState.pauseButton.textContent = "Pause";
         foldingState.isPaused = false;
         const endStageUnfold = -(foldingState.NUM_ANIMATION_STAGES + 1);
-        if (stage === endStageUnfold)
-            console.log(`Folding: Seq unfold complete.`);
-        else if (stage === 0 && foldingState.isFolded)
-            console.log("Folding: Seq fold complete.");
+        if (stage === endStageUnfold) {
+            console.log(`[Anim Trigger] Sequential unfold complete.`);
+            // Ensure isFolded state is false after full unfold
+             foldingState.isFolded = false;
+             if (foldingState.foldButton) foldingState.foldButton.textContent = "Fold";
+        } else if (stage === 0 && foldingState.isFolded) {
+            console.log("[Anim Trigger] Sequential fold complete.");
+             // Ensure isFolded state is true after full fold (already set by toggleFolding)
+             // if (foldingState.foldButton) foldingState.foldButton.textContent = "Unfold"; // Already set
+        } else {
+            // This case might occur if getPivotsForStage returns empty unexpectedly
+            console.log(`[Anim Trigger] Stage ${stage} resulted in no pivots. Animation stopped.`);
+        }
         return;
     }
+
     const unfolding = stage < 0;
     const mPointVec1 = new THREE.Vector3(),
         mPointVec2 = new THREE.Vector3(),
         mPointVec3 = new THREE.Vector3();
 
+    // --- Loop through pivots for the current stage ---
     for (const pivotIndex of foldingState.pivotsInCurrentStage) {
         const pivot = foldingState.pivots[pivotIndex];
-        const faceIndex = pivotIndex;
+        const faceIndex = pivotIndex; // Same as pivotIndex for connected faces
         const faceData = foldingState.allVertices[faceIndex]; // Face being folded
+
+        // --- Check if pivot, its parent, and faceData exist ---
         if (!pivot || !pivot.parent || !faceData) {
+            console.warn(
+                `[Anim Trigger] Pivot ${pivotIndex}: Pivot, scene graph parent, or faceData missing. Skipping. Pivot found: ${!!pivot}, Parent found: ${!!pivot?.parent}, FaceData found: ${!!faceData}`,
+            );
             foldingState.startQuaternions[pivotIndex] = null;
             foldingState.targetQuaternions[pivotIndex] = null;
-            continue;
+            continue; // Skip this pivot for this stage
         }
-        const parent = pivot.parent;
-        // Find parent's ID (which is also the key in foldingState.pivots or 1 for base)
-        const parentKey = Object.keys(foldingState.pivots).find(
-            (key) => foldingState.pivots[key] === parent,
-        );
-        const parentIndex =
-            parent === foldingState.scene
-                ? 1
-                : parentKey
-                  ? parseInt(parentKey, 10)
-                  : null;
+
+        const parentObject = pivot.parent; // Get the actual parent object (Group or Mesh)
+
+        // --- Determine the traversal ID of the parent object --- *FIXED LOGIC*
+        let parentIndex = null;
+        if (parentObject === foldingState.f1Mesh) {
+            // If the parent object IS the base mesh (f1Mesh)
+            parentIndex = 1;
+            console.log(
+                `[Anim Trigger] Pivot ${pivotIndex}: Parent is f1Mesh. ParentIndex set to 1.`,
+            );
+        } else {
+            // If parent is not f1Mesh, search the pivots map
+            const parentKey = Object.keys(foldingState.pivots).find(
+                (key) => foldingState.pivots[key] === parentObject,
+            );
+            if (parentKey) {
+                parentIndex = parseInt(parentKey, 10);
+                console.log(
+                    `[Anim Trigger] Pivot ${pivotIndex}: Parent is another pivot (Group). Found ParentIndex: ${parentIndex}.`,
+                );
+            } else {
+                 // Should not happen if scene graph is built correctly, but log if it does
+                 console.error(
+                     `[Anim Trigger] Pivot ${pivotIndex}: Parent object (${parentObject.type}, ID: ${parentObject.uuid}) is neither f1Mesh nor found in the pivots map. Cannot determine parentIndex.`
+                 );
+            }
+        }
+        // --- End of Parent Index Determination ---
+
+        // Get parent data using the determined parentIndex
         const parentData = parentIndex
             ? foldingState.allVertices[parentIndex]
-            : null; // Parent face data
+            : null;
 
+        // --- Check all necessary data is present before proceeding ---
         if (
             !pivot.userData.axis ||
-            !parentData ||
-            !faceData.conn ||
+            parentIndex === null || // Check if parentIndex was successfully determined
+            !parentData || // Check if parentData was retrieved
+            !faceData.conn || // Check connection info on the folding face
             !parentData.numSides ||
             !faceData.numSides
         ) {
             console.warn(
-                `Folding: Missing data for pivot ${pivotIndex} or parent ${parentIndex}. Axis:`,
-                pivot.userData.axis,
-                "ParentData:",
-                parentData,
-                "FaceData:",
-                faceData,
+                `[Anim Trigger] Pivot ${pivotIndex}: Missing required data for animation calculation. Axis: ${!!pivot.userData.axis}, ParentIndex: ${parentIndex}, ParentData: ${!!parentData}, FaceDataConn: ${!!faceData.conn}, ParentSides: ${parentData?.numSides}, FaceSides: ${faceData?.numSides}. Skipping this pivot.`,
             );
             foldingState.startQuaternions[pivotIndex] = null;
             foldingState.targetQuaternions[pivotIndex] = null;
-            continue;
+            continue; // Skip this pivot if essential data is missing
         }
 
+        // --- Calculate Target Angle ---
         const sides_i = faceData.numSides;
         const sides_j = parentData.numSides;
         let baseFoldAngleKey = `${sides_i}-${sides_j}`;
         let baseTargetAngle = foldingState.currentFoldAngles[baseFoldAngleKey];
+
+        // Fallback key order
         if (baseTargetAngle === undefined) {
             baseFoldAngleKey = `${sides_j}-${sides_i}`;
             baseTargetAngle = foldingState.currentFoldAngles[baseFoldAngleKey];
         }
+        // Final fallback to default angle
         if (baseTargetAngle === undefined) {
             console.warn(
-                `Folding: Using default fold angle for key ${baseFoldAngleKey}.`,
+                `[Anim Trigger] Pivot ${pivotIndex}: Fold angle not found for key '${baseFoldAngleKey}' (or fallback). Using default PI/2.`,
             );
             baseTargetAngle = Math.PI / 2;
-        } // Default to 90 deg if not found
-        if (unfolding) baseTargetAngle = 0; // Target angle is 0 when unfolding
+        }
+        if (unfolding) {
+             baseTargetAngle = 0; // Target is flat when unfolding
+        }
 
-        let angleSign = 1;
+
+        // --- Determine Fold Direction (Angle Sign) ---
+        let angleSign = 1; // Default direction
         if (!unfolding) {
-            // Determine fold direction only when folding
-            const parentWorldVertices =
-                getFoldingMeshWorldVertices(parentIndex);
-            const centerF = parentWorldVertices
-                ? calculateWorldCentroid(parentWorldVertices)
-                : null;
-            const normalF = parentWorldVertices
-                ? calculateWorldNormal(parentWorldVertices)
-                : null;
-            const vertsG_plus = calculateHypotheticalWorldVertices(
-                faceIndex,
-                baseTargetAngle,
-            );
-            const centerG_plus = vertsG_plus
-                ? calculateWorldCentroid(vertsG_plus)
-                : null;
-            const normalG_plus = vertsG_plus
-                ? calculateWorldNormal(vertsG_plus)
-                : null;
-            const vertsG_minus = calculateHypotheticalWorldVertices(
-                faceIndex,
-                -baseTargetAngle,
-            );
-            const centerG_minus = vertsG_minus
-                ? calculateWorldCentroid(vertsG_minus)
-                : null;
-            const normalG_minus = vertsG_minus
-                ? calculateWorldNormal(vertsG_minus)
-                : null;
-            const M1 =
-                centerF && normalF
-                    ? mPointVec1.copy(centerF).add(normalF)
-                    : null;
-            const M2 =
-                centerG_plus && normalG_plus
-                    ? mPointVec2.copy(centerG_plus).add(normalG_plus)
-                    : null;
-            const M2_prime =
-                centerG_minus && normalG_minus
-                    ? mPointVec3.copy(centerG_minus).add(normalG_minus)
-                    : null;
+            // Calculate direction only when folding inwards
+            const parentWorldVertices = getFoldingMeshWorldVertices(parentIndex); // Use correct parentIndex
+            const centerF = parentWorldVertices ? calculateWorldCentroid(parentWorldVertices) : null;
+            const normalF = parentWorldVertices ? calculateWorldNormal(parentWorldVertices) : null;
+
+            // Calculate hypothetical positions/normals for positive and negative fold angles
+            const vertsG_plus = calculateHypotheticalWorldVertices(faceIndex, baseTargetAngle);
+            const centerG_plus = vertsG_plus ? calculateWorldCentroid(vertsG_plus) : null;
+            const normalG_plus = vertsG_plus ? calculateWorldNormal(vertsG_plus) : null;
+
+            const vertsG_minus = calculateHypotheticalWorldVertices(faceIndex, -baseTargetAngle);
+            const centerG_minus = vertsG_minus ? calculateWorldCentroid(vertsG_minus) : null;
+            const normalG_minus = vertsG_minus ? calculateWorldNormal(vertsG_minus) : null;
+
+            // Calculate points offset along normals
+            const M1 = centerF && normalF ? mPointVec1.copy(centerF).add(normalF) : null;
+            const M2 = centerG_plus && normalG_plus ? mPointVec2.copy(centerG_plus).add(normalG_plus) : null;
+            const M2_prime = centerG_minus && normalG_minus ? mPointVec3.copy(centerG_minus).add(normalG_minus) : null;
+
+            // Compare distances to determine which hypothetical fold brings normals closer
             if (M1 && M2 && M2_prime) {
                 const dSq = M1.distanceToSquared(M2);
                 const dPrimeSq = M1.distanceToSquared(M2_prime);
-                angleSign = dSq > dPrimeSq ? 1 : -1;
-            } // Original (potentially buggy) direction logic
-            else {
-                angleSign = 1;
-                console.warn(
-                    `Folding: Could not determine fold direction for face ${faceIndex}, defaulting to +1.`,
-                );
+                angleSign = dSq > dPrimeSq ? 1 : -1; // Original logic: choose sign that results in smaller distance between offset points
+                console.log(`[Anim Trigger] Pivot ${pivotIndex}: Fold direction determined. dSq(+): ${dSq.toFixed(3)}, dSq(-): ${dPrimeSq.toFixed(3)}, angleSign: ${angleSign}`);
+            } else {
+                 angleSign = 1; // Default if calculation fails
+                 console.warn(
+                     `[Anim Trigger] Pivot ${pivotIndex}: Could not determine fold direction using normals. Defaulting to angleSign = +1. M1:${!!M1}, M2:${!!M2}, M2_prime:${!!M2_prime}`,
+                 );
             }
-        }
+        } // end if(!unfolding)
+
+        // --- Set Start and Target Quaternions ---
         const targetAngleValue = angleSign * baseTargetAngle;
         foldingState.startQuaternions[pivotIndex] = pivot.quaternion.clone();
         foldingState.targetQuaternions[pivotIndex] =
@@ -3093,7 +3367,13 @@ function triggerAnimationStage(stage) {
                 pivot.userData.axis,
                 targetAngleValue,
             );
-    }
+        console.log(
+            `[Anim Trigger] Pivot ${pivotIndex}: Target angle: ${targetAngleValue.toFixed(4)} rad. Start/Target Quaternions set.`,
+        );
+
+    } // --- End of loop through pivots ---
+
+    // --- Set Global Animation State ---
     foldingState.animationStartTime = performance.now();
     foldingState.pausedElapsedTime = 0;
     foldingState.isAnimating = true;
@@ -3102,7 +3382,10 @@ function triggerAnimationStage(stage) {
         foldingState.pauseButton.disabled = false;
         foldingState.pauseButton.textContent = "Pause";
     }
-}
+    console.log(`[Anim Trigger] Stage ${stage} initiated. isAnimating = true.`);
+
+} // --- End of triggerAnimationStage ---
+
 
 function toggleFolding() {
     // Uses foldingState
@@ -3321,6 +3604,10 @@ export function switchToFoldingView() {
     console.log("[DEBUG] Visibility switched.");
     console.log("[ViewSwitch] Step 4 Complete.");
 
+    if (toggleFaceNumbersCheckbox) {
+	toggleFaceNumbersCheckbox.disabled = true;
+    }
+
 
     // --- 5. Resize 3D view and start the animation loop ---
     // Use a small timeout (e.g., 10ms) to give the browser time to update DOM visibility
@@ -3421,6 +3708,11 @@ export function show2DView(doRedraw = true) {
     // Hide the color context menu if it's visible
     hideColorContextMenu();
 
+
+
+    if (toggleFaceNumbersCheckbox) {
+	toggleFaceNumbersCheckbox.disabled = false;
+    }
 
     console.log("[DEBUG] Visibility switched back to 2D.");
 
@@ -3555,6 +3847,16 @@ function initialize() {
 	console.log("Looking for colorContextMenu:", document.getElementById("colorContextMenu"));
         colorContextMenu = document.getElementById("colorContextMenu");
         colorMenuList = document.getElementById("colorMenuList");
+	toggleFaceNumbersCheckbox = document.getElementById('toggleFaceNumbers');
+	if (toggleFaceNumbersCheckbox) {
+            toggleFaceNumbersCheckbox.addEventListener('change', (event) => {
+		showFaceNumbers = event.target.checked;
+		// Redraw the 2D net immediately
+		drawNet(); 
+		// No direct call to update 3D view here, as the toggle is 2D-only.
+		// The 3D view will use the 'showFaceNumbers' state when it's created.
+            });
+    }
 	
         // Check if essential context menu DOM elements were found and log warnings if not
         if (!colorContextMenu) console.error("Initialization warning: #colorContextMenu div not found! Color context menu feature will not work.");
