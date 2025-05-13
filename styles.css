@@ -242,3 +242,38 @@ h1 {
     margin-right: 5px;
 }
 
+/* Style for the container div holding the preset label and select */
+#preset-net-container {
+    margin-top: 15px;    /* <<< ADD THIS LINE for space above */
+    margin-bottom: 15px; /* Provides spacing below the group, separating it from polygon buttons */
+}
+
+/* Style for the label above the preset dropdown */
+#preset-net-container label[for="presetNets"] { /* Target the label within the container */
+    display: block;      /* Make label take its own line */
+    margin-bottom: 4px;  /* Small space between label and dropdown */
+    font-size: 0.9em;    /* Optional: match other label sizes */
+    color: #333;        /* Optional: standard text color */
+    /* text-align: left; /* Default, or center if you prefer */
+}
+
+/* Style the preset dropdown (#presetNets) itself */
+#presetNets {
+    display: block;        /* Ensure it takes full width */
+    width: 100%;           /* Match width of other controls */
+    padding: 8px;          /* Match padding of other controls */
+    box-sizing: border-box;/* Include padding/border in width */
+    border: 1px solid #ccc;/* Match border */
+    border-radius: 3px;    /* Match border radius */
+    background-color: #fff;/* Standard white background for dropdowns */
+    cursor: pointer;       /* Indicate it's interactive */
+    font-family: sans-serif;/* Ensure consistent font */
+    font-size: 0.9em;      /* Optional: adjust font size */
+}
+
+/* Optional: Style when the dropdown is focused */
+#presetNets:focus {
+    outline: none; /* Remove default browser outline */
+    border-color: #888; /* Slightly darken border on focus */
+    box-shadow: 0 0 3px rgba(100, 100, 100, 0.3); /* Add subtle glow */
+}

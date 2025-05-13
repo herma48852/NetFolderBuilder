@@ -1,6 +1,6 @@
 // --- Imports ---
 import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { OrbitControls } from './js/OrbitControls.js';
 
 // --- Constants ---
 // App 1 Constants
@@ -1747,6 +1747,54 @@ export function saveNetToFile() {
     console.log("App 1 Net saved.");
 }
 export function handleFileLoad(event) {
+    // Loads App 1 format from user-selected file
+    const file = event.target.files[0];
+    const fileInputElement = event.target; // Keep reference to clear later
+
+    if (!file) {
+        console.log("No file selected.");
+        return;
+    }
+
+    const sourceName = file.name; // Use filename for logging
+    console.log(`[FileLoad] Attempting to load App 1 Net file: ${sourceName}`);
+    const reader = new FileReader();
+
+    reader.onload = (e) => {
+        let loadedData;
+        try {
+            // Step 1: Parse the JSON from the file content
+            loadedData = JSON.parse(e.target.result);
+
+            // Step 2: Call the reusable function to process the data
+            loadNetData(loadedData, sourceName); // Pass parsed data and filename
+
+        } catch (error) {
+            // Catch errors during JSON parsing specifically
+            console.error(`[FileLoad] Error parsing JSON from file "${sourceName}":`, error);
+            alert(`Error reading file "${sourceName}":\nCould not parse file content as valid JSON.\n${error.message}`);
+            clearNetInternal(); // Clear net if parsing fails
+            drawNet();
+        } finally {
+            // Clear the file input regardless of success/failure inside onload
+            if (fileInputElement) fileInputElement.value = "";
+        }
+    };
+
+    reader.onerror = (e) => {
+        // Handle errors during the file reading process itself
+        console.error(`[FileLoad] Error reading file "${sourceName}":`, e);
+        alert(`Error reading file "${sourceName}".`);
+        if (fileInputElement) fileInputElement.value = ""; // Also clear input on read error
+        clearNetInternal();
+        drawNet();
+    };
+
+    // Start reading the file
+    reader.readAsText(file);
+}
+
+export function handleFileLoad2xxx(event) {
     // Loads App 1 format
     const file = event.target.files[0];
     if (!file) {
@@ -1813,6 +1861,94 @@ export function handleFileLoad(event) {
     };
     reader.readAsText(file);
 }
+
+/**
+ * Processes parsed net data (from file or fetch), updates the application state,
+ * and redraws the 2D canvas.
+ * @param {object} netData - The parsed JavaScript object containing net configuration.
+ * @param {string} sourceName - A descriptive name of the source (e.g., file name or preset name) for logging.
+ */
+function loadNetData(netData, sourceName = "Loaded Data") {
+    console.log(`[LoadNetData] Processing data from: ${sourceName}`);
+    try {
+        // --- Validation ---
+        if (
+            !netData ||
+            !Array.isArray(netData.polygons) ||
+            typeof netData.nextId !== "number" // Keep basic format check
+        ) {
+            // More specific error for invalid format
+            throw new Error(
+                `Invalid net data format in "${sourceName}". Missing 'polygons' array or 'nextId'.`,
+            );
+        }
+
+        // --- Clear existing net ---
+        // Make sure 3D scene is cleared BEFORE clearing 2D state if switching views
+        if (foldingState.threeInitialized) clearFoldingSceneGeometry();
+        clearNetInternal(); // Clears 2D editor state
+
+        // --- Process Polygons ---
+        let maxId = -1;
+        const loadedPolygons = netData.polygons
+            .map((polyData) => {
+                try {
+                    // Use Polygon.fromJSON to create instances
+                    const poly = Polygon.fromJSON(polyData);
+                    if (poly.id > maxId) maxId = poly.id;
+                    return poly;
+                } catch (polyError) {
+                    // Log error specific to polygon creation
+                    console.error(
+                        `[LoadNetData] Error creating polygon from data in "${sourceName}":`,
+                        polyData,
+                        polyError,
+                    );
+                    return null; // Skip this polygon if creation fails
+                }
+            })
+            .filter((p) => p !== null); // Remove any polygons that failed creation
+
+        // Check if any polygons were actually loaded
+        if (loadedPolygons.length === 0 && netData.polygons.length > 0) {
+             console.warn(`[LoadNetData] No valid polygons were created from "${sourceName}", although polygon data was present.`);
+             // Optionally throw an error or alert the user
+             // throw new Error(`Failed to load any valid polygons from "${sourceName}".`);
+        }
+
+
+        // --- Update State ---
+        updateState({
+            netPolygons: loadedPolygons,
+            // Ensure nextPolygonId is at least maxId + 1
+            nextPolygonId: Math.max(maxId + 1, netData.nextId || 0),
+            // Load view offset, defaulting to 0
+            viewOffsetX: netData.viewOffset?.x || 0,
+            viewOffsetY: netData.viewOffset?.y || 0,
+            // Load colors, falling back to defaults (polygonColors seems unused now?)
+            // polygonColors: netData.polygonColors || { ...DEFAULT_COLORS },
+        });
+
+        console.log(
+            `[LoadNetData] Net processed from "${sourceName}". ${editorState.netPolygons.length} polygons loaded. Next ID: ${editorState.nextPolygonId}`,
+        );
+
+        // --- Update UI ---
+        show2DView(false); // Ensure 2D view is visible (avoids redraw)
+        resizeCanvas();    // Resize canvas *then* drawNet (resizeCanvas calls drawNet)
+        // drawNet(); // Explicit drawNet call - resizeCanvas already does this.
+        console.log(`[LoadNetData] Canvas redrawn after loading "${sourceName}".`);
+
+    } catch (error) {
+        // Catch errors specific to processing the validated data
+        console.error(`[LoadNetData] Error processing net data from "${sourceName}":`, error);
+        alert(`Error loading net from "${sourceName}":\n${error.message}`);
+        // Clear potentially partially loaded state on processing error
+        clearNetInternal();
+        drawNet(); // Redraw the cleared state
+    }
+}
+
 /////////////////////////
 // end of fileUtils.js section
 /////////////////////////
@@ -3929,3 +4065,45 @@ if (document.readyState === "loading") {
 } else {
   initialize();
 }
+
+// Assuming 'presetNets' element is already selected:
+// const presetNets = document.getElementById("presetNets");
+const presetNets = document.getElementById("presetNets");
+
+presetNets.addEventListener("change", async (e) => {
+    const netName = e.target.value;
+    if (!netName) return; // Exit if no value (e.g., default option)
+
+    const sourceName = `${netName} (Preset)`; // Descriptive name for logging
+    console.log(`[PresetLoad] User selected preset: ${netName}`);
+
+    try {
+        // Step 1: Fetch the preset JSON file
+        const response = await fetch(`phys-nets/${netName}.json`); // Assumes nets folder
+
+        // Step 2: Check if fetch was successful
+        if (!response.ok) {
+            throw new Error(`Could not load preset "${netName}". Server response: ${response.status} ${response.statusText}`);
+        }
+
+        // Step 3: Parse the JSON data from the response
+        const netData = await response.json();
+        console.log(`[PresetLoad] Successfully fetched and parsed ${netName}.json`);
+
+        // Step 4: Call the reusable function to process the data
+        loadNetData(netData, sourceName); // Pass parsed data and preset name
+
+    } catch (error) {
+        // Catch errors during fetch, parsing, or network issues
+        console.error(`[PresetLoad] Error loading preset net "${netName}":`, error);
+        alert(`Error loading preset net "${netName}":\n${error.message}`);
+        // Optionally clear the net on preset load error
+        // clearNetInternal();
+        // drawNet();
+    } finally {
+        // Reset the dropdown regardless of success/failure
+        presetNets.value = "";
+        console.log("[PresetLoad] Dropdown reset.");
+    }
+});
+
