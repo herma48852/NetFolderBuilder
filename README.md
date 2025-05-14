@@ -106,4 +106,19 @@ The 3D viewer animates the folding of the 2D net into its corresponding polyhedr
 5.  **Return to Editor:**
     * Click **Back to 2D Editor** to make further changes to the net.
 
+
+## Acknowledgements & Libraries Used
+
+This project utilizes the following open-source libraries:
+
+* **Three.js:** A comprehensive 3D graphics library for creating and displaying animated 3D computer graphics in a web browser.
+    * Copyright 2010-2023 Three.js Authors
+    * License: MIT
+    * Website: [https://threejs.org/](https://threejs.org/)
+    * Includes `OrbitControls.js` from the Three.js examples.
+
+* **TWEEN.js:** A JavaScript tweening engine for easy animations.
+    * License: MIT
+    * Repository: [https://github.com/tweenjs/tween.js/](https://github.com/tweenjs/tween.js/)
+
 Enjoy exploring the world of polyhedra!
