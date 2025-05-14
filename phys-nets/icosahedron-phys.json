@@ -69,7 +69,7 @@
         "y": 259.12383414914825
       },
       "rotationAngle": 1.0471975511965976,
-      "color": "yellow",
+      "color": "red",
       "connections": {
         "1": {
           "polyId": 2,
@@ -149,7 +149,7 @@
         "y": 331.29261779785156
       },
       "rotationAngle": 2.220446049250313e-15,
-      "color": "green",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 6,
@@ -189,7 +189,7 @@
         "y": 259.12383414914837
       },
       "rotationAngle": 3.1415926535897953,
-      "color": "yellow",
+      "color": "pink",
       "connections": {
         "0": {
           "polyId": 8,
@@ -309,7 +309,7 @@
         "y": 331.2926177978518
       },
       "rotationAngle": 3.1086244689504383e-15,
-      "color": "green",
+      "color": "red",
       "connections": {
         "0": {
           "polyId": 14,
@@ -349,7 +349,7 @@
         "y": 259.12383414914876
       },
       "rotationAngle": 1.047197551196602,
-      "color": "yellow",
+      "color": "pink",
       "connections": {
         "1": {
           "polyId": 16,
@@ -385,7 +385,7 @@
         "y": 331.29261779785213
       },
       "rotationAngle": 4.440892098500626e-15,
-      "color": "green",
+      "color": "pink",
       "connections": {
         "0": {
           "polyId": 18,
@@ -398,14 +398,5 @@
   "viewOffset": {
     "x": 0,
     "y": 0
-  },
-  "polygonColors": {
-    "3": "#FFADAD",
-    "4": "#FFD6A5",
-    "5": "#FDFFB6",
-    "6": "#CAFFBF",
-    "7": "#9BF6FF",
-    "8": "#A0C4FF",
-    "10": "#BDB2FF"
   }
 }
