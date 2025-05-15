@@ -17,6 +17,11 @@ const POLYGON_TYPES = {
     10: "Decagon", // Removed 9 for consistency
 };
 
+// --- Constants for Zoom Control 
+const MIN_ZOOM = 0.2; // Minimum zoom level
+const MAX_ZOOM = 5.0; // Maximum zoom level
+const ZOOM_SENSITIVITY = 0.001; // Adjusts how much each wheel tick zooms
+
 // --- UPDATED DEFAULT_COLORS ---
 // Using standard HTML color names where available
 const DEFAULT_COLORS = {
@@ -339,6 +344,7 @@ let editorState = {
     // --- State for Color Context Menu ---
     colorMenuPolygonId: null, // ID of the polygon that was right-clicked
     customColorsHistory: [], // Array to store custom colors chosen via the palette picker
+    zoomLevel: 1.0,  // range 0.2 to 5.0
 };
 
 // --- App 2 (Folding Viewer) State (Encapsulated) ---
@@ -686,29 +692,52 @@ export class Polygon {
 /////////////////////////
 // start of drawing.js section
 /////////////////////////
-export function clearCanvas() {
-    if (ctx && canvas) ctx.clearRect(0, 0, canvas.width, canvas.height);
-}
+
+// Assuming editorState includes:
+// editorState.zoomLevel (e.g., 1.0)
+// editorState.viewOffsetX (e.g., 0) // Represents world coordinate for view origin
+// editorState.viewOffsetY (e.g., 0) // Represents world coordinate for view origin
+
 export function drawNet() {
     if (!ctx || !canvas) return;
+
+    // --- Save the current canvas state (transformations, styles, etc.) ---
+    ctx.save();
+
+    // --- Clear the entire physical canvas viewport ---
+    // This should happen before any new transformations for the current frame.
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // --- Apply zoom first ---
+    // This scales the coordinate system for all subsequent drawing.
+    ctx.scale(editorState.zoomLevel, editorState.zoomLevel);
+
+    // --- Then apply pan (viewOffset is in world units) ---
+    // This moves the origin of the already scaled coordinate system.
+    ctx.translate(editorState.viewOffsetX, editorState.viewOffsetY);
+
+    // Updated console log to reflect new transformation order and units
     console.log(
-        `[DEBUG DrawNet] Drawing ${editorState.netPolygons.length} polygons. Offset: (${editorState.viewOffsetX.toFixed(0)}, ${editorState.viewOffsetY.toFixed(0)})`,
+        `[DEBUG DrawNet] Drawing ${editorState.netPolygons.length} polygons. Zoom: ${editorState.zoomLevel.toFixed(2)}, Pan Offset (World Units): (${editorState.viewOffsetX.toFixed(0)}, ${editorState.viewOffsetY.toFixed(0)})`,
     );
-    clearCanvas();
+
     // Draw non-selected polygons first
+    // Polygons are drawn using their inherent world coordinates.
+    // The pan offset is no longer passed to poly.draw as it's handled by ctx.translate.
     editorState.netPolygons.forEach((poly) => {
-        if (!poly.isSelected)
-            poly.draw(ctx, editorState.viewOffsetX, editorState.viewOffsetY);
+        if (!poly.isSelected) {
+            poly.draw(ctx); // Removed viewOffsetX, viewOffsetY
+        }
     });
+
     // Draw selected polygon last
     const selectedPoly = getSelectedPolygon();
-    if (selectedPoly)
-        selectedPoly.draw(
-            ctx,
-            editorState.viewOffsetX,
-            editorState.viewOffsetY,
-        );
+    if (selectedPoly) {
+        selectedPoly.draw(ctx); // Removed viewOffsetX, viewOffsetY
+    }
+
     // Draw snap highlights
+    // These are also drawn in the transformed (world) coordinate space.
     if (editorState.currentSnapTarget && editorState.draggedPolygon) {
         const { poly1, edge1Index, poly2, edge2Index } =
             editorState.currentSnapTarget;
@@ -737,21 +766,24 @@ export function drawNet() {
                         edge1Index,
                         "#FF00FF",
                         4,
-                        editorState.viewOffsetX,
-                        editorState.viewOffsetY,
+                        // Removed viewOffsetX, viewOffsetY
                     );
                     poly2.drawEdgeHighlight(
                         ctx,
                         edge2Index,
                         "#FF00FF",
                         4,
-                        editorState.viewOffsetX,
-                        editorState.viewOffsetY,
+                        // Removed viewOffsetX, viewOffsetY
                     );
                 }
             }
         }
     }
+
+    // --- Restore the canvas state ---
+    // This removes the scale and translate transformations applied in this function call,
+    // resetting the context for any subsequent drawing or the next frame.
+    ctx.restore();
 }
 /////////////////////////
 // end of drawing.js section
@@ -832,14 +864,101 @@ export function placeNewPolygon(mousePos) {
 /////////////////////////
 // start of interaction.js section
 /////////////////////////
+/**
+ * Handles mouse wheel events on the 2D canvas for zooming.
+ * Zooms in or out, centered on the mouse cursor's position.
+ * @param {WheelEvent} event - The wheel event object.
+ */
+function handleCanvasWheelZoom(event) {
+    if (!canvas) return;
+    event.preventDefault(); // Prevent default page scrolling
+
+    // Get mouse position relative to the canvas element (screen pixels)
+    const rawMousePos = getRawMousePos(canvas, event);
+
+    // Get mouse position in world coordinates BEFORE the zoom
+    // Note: getMousePos itself needs to be zoom-aware for interactions,
+    // but here we use it to get the world point under the cursor with the *current* zoom.
+    const worldMousePosBeforeZoom = getMousePos(canvas, event);
+
+    // Determine zoom direction and calculate new zoom level
+    const delta = event.deltaY * -ZOOM_SENSITIVITY;
+    const oldZoomLevel = editorState.zoomLevel;
+    let newZoomLevel = oldZoomLevel + delta * oldZoomLevel; // Multiplicative zoom based on current level
+
+    // Clamp the new zoom level
+    newZoomLevel = Math.max(MIN_ZOOM, Math.min(MAX_ZOOM, newZoomLevel));
+
+    if (newZoomLevel === oldZoomLevel) {
+        return; // No change in zoom, do nothing
+    }
+
+    // Update the zoom level in the state
+    // updateState({ zoomLevel: newZoomLevel }); // Update zoom first
+
+    // Adjust viewOffset to keep the point under the mouse stationary.
+    // The world coordinate (worldMousePosBeforeZoom.x, worldMousePosBeforeZoom.y)
+    // should remain at the same screen pixel (rawMousePos.x, rawMousePos.y) after zoom.
+    //
+    // Let P_screen = (rawMousePos.x, rawMousePos.y)
+    // Let P_world = (worldMousePosBeforeZoom.x, worldMousePosBeforeZoom.y)
+    //
+    // Before zoom: P_world.x = (P_screen.x / oldZoomLevel) - viewOffsetX_old
+    //              P_world.y = (P_screen.y / oldZoomLevel) - viewOffsetY_old
+    //
+    // After zoom, we want P_world to still correspond to P_screen:
+    //              P_world.x = (P_screen.x / newZoomLevel) - viewOffsetX_new
+    //              P_world.y = (P_screen.y / newZoomLevel) - viewOffsetY_new
+    //
+    // Solving for viewOffsetX_new:
+    // viewOffsetX_new = (P_screen.x / newZoomLevel) - P_world.x
+    // viewOffsetY_new = (P_screen.y / newZoomLevel) - P_world.y
+
+    const newViewOffsetX = (rawMousePos.x / newZoomLevel) - worldMousePosBeforeZoom.x;
+    const newViewOffsetY = (rawMousePos.y / newZoomLevel) - worldMousePosBeforeZoom.y;
+
+    updateState({
+        zoomLevel: newZoomLevel,
+        viewOffsetX: newViewOffsetX,
+        viewOffsetY: newViewOffsetY,
+    });
+
+    drawNet(); // Redraw the canvas with the new zoom and offset
+}
+
+/**
+ * Gets the mouse position in world coordinates, accounting for canvas offset,
+ * current view pan (viewOffset), and zoom level.
+ * @param {HTMLCanvasElement} canvasElement - The canvas element.
+ * @param {MouseEvent} event - The mouse event.
+ * @returns {{x: number, y: number}} The mouse position in world coordinates.
+ */
 export function getMousePos(canvasElement, event) {
     if (!canvasElement) return { x: 0, y: 0 };
     const rect = canvasElement.getBoundingClientRect();
-    return {
-        x: event.clientX - rect.left - editorState.viewOffsetX,
-        y: event.clientY - rect.top - editorState.viewOffsetY,
-    };
+
+    // Mouse position relative to the canvas element (screen pixels)
+    const canvasX = event.clientX - rect.left;
+    const canvasY = event.clientY - rect.top;
+
+    // Convert canvas screen coordinates to world coordinates
+    // 1. Undo the translation effect: (canvasCoord - 0) / zoomLevel
+    //    (The '0' is because ctx.translate moves the origin, so screen (0,0) is where the world origin is drawn)
+    //    No, this is simpler: screenToWorld = (screenCoord / zoom) - viewOffset
+    //    Because in drawNet: ctx.scale(zoom); ctx.translate(viewOffsetX, viewOffsetY);
+    //    So, a world point (wx, wy) is drawn at screen point sx, sy:
+    //    sx = (wx + viewOffsetX) * zoom
+    //    sy = (wy + viewOffsetY) * zoom
+    //    Therefore:
+    //    wx = (sx / zoom) - viewOffsetX
+    //    wy = (sy / zoom) - viewOffsetY
+
+    const worldX = (canvasX / editorState.zoomLevel) - editorState.viewOffsetX;
+    const worldY = (canvasY / editorState.zoomLevel) - editorState.viewOffsetY;
+
+    return { x: worldX, y: worldY };
 }
+
 function getRawMousePos(canvasElement, event) {
     if (!canvasElement) return { x: 0, y: 0 };
     const rect = canvasElement.getBoundingClientRect();
@@ -1217,42 +1336,50 @@ export function handleMouseDown(event) {
 }
 
 
+/**
+ * Handles mouse move events for dragging polygons or panning the view.
+ * @param {MouseEvent} event - The mouse event.
+ */
 export function handleMouseMove(event) {
     if (!canvas) return;
-    const rawMousePos = getRawMousePos(canvas, event);
-    const worldMousePos = getMousePos(canvas, event);
+    const rawMousePos = getRawMousePos(canvas, event); // Mouse relative to canvas element
+    const worldMousePos = getMousePos(canvas, event);   // Mouse in world coordinates
 
-    // Existing logic for active panning
+    // Active panning
     if (editorState.isActivelyPanning) {
-        const dx = rawMousePos.x - editorState.panStartX;
-        const dy = rawMousePos.y - editorState.panStartY;
+        // dx, dy are in screen pixels
+        const dxScreen = rawMousePos.x - editorState.panStartX;
+        const dyScreen = rawMousePos.y - editorState.panStartY;
+
+        // To convert screen pixel delta to world unit delta, divide by zoomLevel
+        // This is because viewOffsetX/Y are in world units.
+        const dxWorld = dxScreen / editorState.zoomLevel;
+        const dyWorld = dyScreen / editorState.zoomLevel;
+
         updateState({
-            viewOffsetX: editorState.viewOffsetX + dx,
-            viewOffsetY: editorState.viewOffsetY + dy,
-            panStartX: rawMousePos.x,
+            viewOffsetX: editorState.viewOffsetX + dxWorld,
+            viewOffsetY: editorState.viewOffsetY + dyWorld,
+            panStartX: rawMousePos.x, // panStartX/Y remain in screen coordinates
             panStartY: rawMousePos.y,
         });
-        drawNet(); // Redraw during panning
-        return; // Stop here if panning
+        drawNet();
+        return;
     }
 
-    // Existing logic for dragging a polygon
+    // Dragging a polygon (uses worldMousePos, which is now zoom-aware)
     if (editorState.isDragging && editorState.draggedPolygon) {
         const newCenter = {
             x: worldMousePos.x - editorState.dragOffsetX,
             y: worldMousePos.y - editorState.dragOffsetY,
         };
-        editorState.draggedPolygon.updatePosition(newCenter); // Update polygon position (mutate directly)
+        editorState.draggedPolygon.updatePosition(newCenter);
 
-        // Find a snap target for the dragged polygon
         const snapTarget = findSnapTarget(editorState.draggedPolygon);
-        updateState({ currentSnapTarget: snapTarget }); // Update snap target state
-
-        drawNet(); // Redraw to show dragging and potential snap highlights
+        updateState({ currentSnapTarget: snapTarget });
+        drawNet();
     }
-    // Note: Mouse move doesn't interact with the context menu visibility directly,
-    // but if a drag was in progress and the mouse leaves the canvas, handleMouseLeave will handle it.
 }
+
 export function handleMouseUp(event) {
     if (!canvas) return;
 
@@ -2342,7 +2469,7 @@ function setupEventListeners() {
     canvas.addEventListener("mousemove", handleMouseMove);
     canvas.addEventListener("mouseup", handleMouseUp);
     canvas.addEventListener("mouseleave", handleMouseLeave);
-
+    canvas.addEventListener("wheel", handleCanvasWheelZoom);
     
     // --- ADD Right-Click Context Menu Listener ---
     // Only add the listener if the context menu element was found
